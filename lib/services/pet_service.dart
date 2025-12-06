@@ -6,11 +6,22 @@ import 'auth_service.dart';
 class Pet {
   final int id;
   final String name;
-  final String petType;
-  final String? breed;
+  final int petType;
+  final int? breed;
   final int? ageYears;
-  final String? gender;
-  final String? photo;
+  final int? ageMonths;
+  final int? ageWeeks;
+  final String? ageDisplay;
+  final int? gender;
+  final String? image;
+  final double? weight;
+  final bool neutered;
+  final String? birthDate;
+  final bool unknownBreed;
+  final Map<String, dynamic>? petTypeDetail;
+  final Map<String, dynamic>? genderDetail;
+  final Map<String, dynamic>? breedDetail;
+  final Map<String, dynamic>? ageCategoryDetail;
 
   Pet({
     required this.id,
@@ -18,36 +29,96 @@ class Pet {
     required this.petType,
     this.breed,
     this.ageYears,
+    this.ageMonths,
+    this.ageWeeks,
+    this.ageDisplay,
     this.gender,
-    this.photo,
+    this.image,
+    this.weight,
+    required this.neutered,
+    this.birthDate,
+    required this.unknownBreed,
+    this.petTypeDetail,
+    this.genderDetail,
+    this.breedDetail,
+    this.ageCategoryDetail,
   });
 
   factory Pet.fromJson(Map<String, dynamic> json) {
     return Pet(
       id: json['id'],
-      name: json['name'],
-      petType: json['pet_type'] ?? 'Dog',
+      name: json['name'] ?? 'Unknown',
+      petType: json['pet_type'] ?? 1,
       breed: json['breed'],
       ageYears: json['age_years'],
+      ageMonths: json['age_months'],
+      ageWeeks: json['age_weeks'],
+      ageDisplay: json['age_display'],
       gender: json['gender'],
-      photo: json['photo'],
+      image: json['image'],
+      weight: json['weight'] != null 
+          ? double.tryParse(json['weight'].toString()) 
+          : null,
+      neutered: json['neutered'] ?? false,
+      birthDate: json['birth_date'],
+      unknownBreed: json['unknown_breed'] ?? false,
+      petTypeDetail: json['pet_type_detail'],
+      genderDetail: json['gender_detail'],
+      breedDetail: json['breed_detail'],
+      ageCategoryDetail: json['age_category_detail'],
     );
   }
 
-  String get displayBreed => breed ?? 'Unknown breed';
+  String get displayBreed {
+    if (unknownBreed) return 'Mixed breed';
+    if (breedDetail != null && breedDetail!['name'] != null) {
+      return breedDetail!['name'];
+    }
+    return 'Unknown breed';
+  }
   
   String get displayAge {
-    if (ageYears == null) return '';
-    return '$ageYears year${ageYears! > 1 ? 's' : ''}';
+    // Use the age_display from API if available
+    if (ageDisplay != null && ageDisplay!.isNotEmpty) {
+      return ageDisplay!;
+    }
+    
+    // Fallback to calculating from years and months
+    if (ageYears == null && ageMonths == null) return 'Age unknown';
+    
+    List<String> ageParts = [];
+    if (ageYears != null && ageYears! > 0) {
+      ageParts.add('$ageYears year${ageYears! > 1 ? 's' : ''}');
+    }
+    if (ageMonths != null && ageMonths! > 0) {
+      ageParts.add('$ageMonths month${ageMonths! > 1 ? 's' : ''}');
+    }
+    
+    return ageParts.isEmpty ? 'Age unknown' : ageParts.join(' ');
+  }
+  
+  String get displayGender {
+    if (genderDetail != null && genderDetail!['name'] != null) {
+      return genderDetail!['name'];
+    }
+    return '';
+  }
+
+  String get displayPetType {
+    if (petTypeDetail != null && petTypeDetail!['name'] != null) {
+      return petTypeDetail!['name'];
+    }
+    return '';
   }
 
   String get petIcon {
-    switch (petType.toLowerCase()) {
-      case 'dog':
+    // 1 = Dog, 2 = Cat (based on your data)
+    switch (petType) {
+      case 1:
         return '🐕';
-      case 'cat':
+      case 2:
         return '😺';
-      case 'bird':
+      case 3:
         return '🦜';
       default:
         return '🐾';
@@ -78,8 +149,20 @@ class PetService {
       print('Get pets status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => Pet.fromJson(json)).toList();
+        final data = jsonDecode(response.body);
+        print('Pets response data: $data');
+        
+        // Handle both list and paginated response formats
+        List<dynamic> petsData;
+        if (data is List) {
+          petsData = data;
+        } else if (data is Map && data.containsKey('results')) {
+          petsData = data['results'];
+        } else {
+          petsData = [];
+        }
+        
+        return petsData.map((json) => Pet.fromJson(json)).toList();
       }
 
       return [];

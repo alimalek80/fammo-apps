@@ -4,6 +4,7 @@ import '../services/user_service.dart';
 import '../services/pet_service.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
+import 'pet_detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -306,63 +307,100 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildPetCard(Pet pet) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          // Pet Image/Avatar
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8F5F3),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                pet.petIcon,
-                style: const TextStyle(fontSize: 32),
-              ),
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PetDetailPage(pet: pet),
           ),
-          const SizedBox(width: 16),
-          // Pet Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Pet Image/Avatar
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5F3),
+                borderRadius: BorderRadius.circular(12),
+                image: pet.image != null
+                    ? DecorationImage(
+                        image: NetworkImage(pet.image!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: pet.image == null
+                  ? Center(
+                      child: Text(
+                        pet.petIcon,
+                        style: const TextStyle(fontSize: 32),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            // Pet Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          pet.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2C3E50),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(pet.petIcon, style: const TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${pet.displayBreed}${pet.displayAge.isNotEmpty ? ' • ${pet.displayAge}' : ''}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF7F8C8D),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (pet.displayGender.isNotEmpty)
                     Text(
-                      pet.name,
+                      pet.displayGender,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
+                        fontSize: 12,
+                        color: Color(0xFF7F8C8D),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(pet.petIcon, style: const TextStyle(fontSize: 16)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${pet.displayBreed} • ${pet.displayAge}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF7F8C8D),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: Color(0xFF7F8C8D)),
-        ],
+            const Icon(Icons.chevron_right, color: Color(0xFF7F8C8D)),
+          ],
+        ),
       ),
     );
   }
