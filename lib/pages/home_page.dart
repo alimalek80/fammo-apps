@@ -5,6 +5,7 @@ import '../services/pet_service.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'pet_detail_page.dart';
+import 'add_pet_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -191,8 +192,18 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 12),
                       // Add Pet Button
                       InkWell(
-                        onTap: () {
-                          // TODO: Navigate to add pet
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddPetPage(),
+                            ),
+                          );
+                          
+                          if (result == true && mounted) {
+                            // Refresh pet list
+                            _loadData();
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -308,13 +319,18 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildPetCard(Pet pet) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => PetDetailPage(pet: pet),
           ),
         );
+        
+        if (result == true && mounted) {
+          // Refresh pet list if edited
+          _loadData();
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),

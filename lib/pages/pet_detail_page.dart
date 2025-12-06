@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/pet_service.dart';
+import 'edit_pet_page.dart';
 
 class PetDetailPage extends StatelessWidget {
   final Pet pet;
@@ -25,8 +26,18 @@ class PetDetailPage extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, color: Color(0xFF2C3E50)),
-                    onPressed: () {
-                      // TODO: Navigate to edit pet page
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditPetPage(pet: pet),
+                        ),
+                      );
+                      
+                      if (result == true && context.mounted) {
+                        // Refresh the pet list by popping back
+                        Navigator.pop(context, true);
+                      }
                     },
                   ),
                 ],
@@ -379,9 +390,10 @@ class PetDetailPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     
                     // Treats Section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Container(
+                    if (pet.treatFrequencyDetail != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -431,6 +443,76 @@ class PetDetailPage extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (pet.treatFrequencyDetail != null)
+                      const SizedBox(height: 16),
+                    
+                    // Health Issues Section
+                    if (pet.healthIssuesDetail != null && pet.healthIssuesDetail!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.medical_services_outlined,
+                                color: Color(0xFFFF9800),
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Health Issues',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF2C3E50),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: pet.healthIssuesDetail!.map((issue) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            issue['name'] ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF2C3E50),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    
+                    if (pet.healthIssuesDetail != null && pet.healthIssuesDetail!.isNotEmpty)
+                      const SizedBox(height: 16),
+                    
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -533,94 +615,112 @@ class PetDetailPage extends StatelessWidget {
   }
 
   String _getActivityLevel() {
-    // This would come from the activity_level_detail in the full API response
-    // For now, return a placeholder
-    return 'High';
+    if (pet.activityLevelDetail != null && pet.activityLevelDetail!['name'] != null) {
+      return pet.activityLevelDetail!['name'];
+    }
+    return 'Not specified';
   }
 
   bool _hasAllergies() {
-    // Check if pet has any food allergies other than "Nothing"
-    return true; // Show allergies section
+    return pet.foodAllergiesDetail != null && 
+           pet.foodAllergiesDetail!.isNotEmpty;
   }
 
   List<Widget> _getAllergyChips() {
-    // This would come from food_allergies_detail in the full API response
-    return [
-      Container(
+    if (pet.foodAllergiesDetail == null || pet.foodAllergiesDetail!.isEmpty) {
+      return [];
+    }
+    
+    return pet.foodAllergiesDetail!.map((allergy) {
+      return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Text(
-          'Chicken',
-          style: TextStyle(
+        child: Text(
+          allergy['name'] ?? '',
+          style: const TextStyle(
             fontSize: 12,
             color: Color(0xFF2C3E50),
           ),
         ),
-      ),
-    ];
+      );
+    }).toList();
   }
 
   List<Widget> _getFoodTypeChips() {
-    // This would come from food_types_detail in the full API response
-    return [
-      Container(
+    if (pet.foodTypesDetail == null || pet.foodTypesDetail!.isEmpty) {
+      return [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE0F2F1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text(
+            'Not specified',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF26B5A4),
+            ),
+          ),
+        ),
+      ];
+    }
+    
+    return pet.foodTypesDetail!.map((foodType) {
+      return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFFE0F2F1),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Text(
-          'Dry',
-          style: TextStyle(
+        child: Text(
+          foodType['name'] ?? '',
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Color(0xFF26B5A4),
           ),
         ),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE0F2F1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Text(
-          'Wet',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF26B5A4),
-          ),
-        ),
-      ),
-    ];
+      );
+    }).toList();
   }
 
   String _getBodyType() {
-    // This would come from body_type_detail in the full API response
-    return 'Just right';
+    if (pet.bodyTypeDetail != null && pet.bodyTypeDetail!['name'] != null) {
+      return pet.bodyTypeDetail!['name'];
+    }
+    return 'Not specified';
   }
 
   String _getBodyTypeDescription() {
-    // This would come from body_type_detail.description in the full API response
-    return 'Healthy shape with a visible waist but not too thin.';
+    if (pet.bodyTypeDetail != null && pet.bodyTypeDetail!['description'] != null) {
+      return pet.bodyTypeDetail!['description'];
+    }
+    return '';
   }
 
   String _getFoodFeeling() {
-    // This would come from food_feeling_detail in the full API response
-    return 'A foodie - Loves eating just about anything';
+    if (pet.foodFeelingDetail != null && pet.foodFeelingDetail!['name'] != null) {
+      return pet.foodFeelingDetail!['name'];
+    }
+    return 'Not specified';
   }
 
   String _getTreatFrequency() {
-    // This would come from treat_frequency_detail in the full API response
-    return 'Has lots';
+    if (pet.treatFrequencyDetail != null && pet.treatFrequencyDetail!['name'] != null) {
+      return pet.treatFrequencyDetail!['name'];
+    }
+    return 'Not specified';
   }
 
   String _getTreatFrequencyDescription() {
-    // This would come from treat_frequency_detail.description in the full API response
-    return '4+ times a day';
+    if (pet.treatFrequencyDetail != null && pet.treatFrequencyDetail!['description'] != null) {
+      return pet.treatFrequencyDetail!['description'];
+    }
+    return '';
   }
 }
