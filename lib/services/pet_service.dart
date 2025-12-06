@@ -779,4 +779,31 @@ class PetService {
       return [];
     }
   }
+
+  Future<bool> deletePet(int petId) async {
+    final baseUrl = await ConfigService.getBaseUrl();
+    final accessToken = await _authService.getAccessToken();
+
+    if (accessToken == null) return false;
+
+    final url = '$baseUrl/api/v1/pets/$petId/';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('Delete pet status: ${response.statusCode}');
+      print('Delete pet response: ${response.body}');
+
+      return response.statusCode == 204 || response.statusCode == 200;
+    } catch (e) {
+      print('Error deleting pet: $e');
+      return false;
+    }
+  }
 }

@@ -6,6 +6,7 @@ import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'pet_detail_page.dart';
 import 'add_pet_page.dart';
+import 'pets_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -150,8 +151,17 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () {
-                              // TODO: Navigate to pets list
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const PetsListPage(),
+                                ),
+                              );
+                              
+                              if (result == true && mounted) {
+                                _loadData();
+                              }
                             },
                             child: const Row(
                               children: [
@@ -556,8 +566,20 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildNavItem(IconData icon, String label, bool isActive) {
     return InkWell(
-      onTap: () {
-        // TODO: Navigate to respective page
+      onTap: () async {
+        if (label == 'Pets') {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PetsListPage(),
+            ),
+          );
+          
+          if (result == true && mounted) {
+            _loadData();
+          }
+        }
+        // TODO: Navigate to other pages
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
