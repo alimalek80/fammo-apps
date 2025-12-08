@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
 import '../services/pet_service.dart';
+import '../services/clinic_service.dart';
+import '../services/location_service.dart';
+import '../models/clinic.dart';
+import 'package:geolocator/geolocator.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'pet_detail_page.dart';
 import 'add_pet_page.dart';
 import 'pets_list_page.dart';
+import 'clinics_list_page.dart';
+import 'clinic_details_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,9 +25,13 @@ class _HomePageState extends State<HomePage> {
   final AuthService _authService = AuthService();
   final UserService _userService = UserService();
   final PetService _petService = PetService();
+  final ClinicService _clinicService = ClinicService();
+  final LocationService _locationService = LocationService();
   
   UserProfile? _userProfile;
   List<Pet> _pets = [];
+  List<Clinic> _nearbyClinics = [];
+  Position? _userPosition;
   bool _isLoading = true;
 
   @override
@@ -36,11 +46,50 @@ class _HomePageState extends State<HomePage> {
     final profile = await _userService.getUserProfile();
     final pets = await _petService.getUserPets();
     
-    setState(() {
-      _userProfile = profile;
-      _pets = pets;
-      _isLoading = false;
-    });
+    // Get user location
+    final position = await _locationService.getCurrentPosition();
+    _userPosition = position;
+    
+    // Get clinics
+    try {
+      final clinics = await _clinicService.listClinics();
+      
+      // Sort by distance if location available
+      if (_userPosition != null) {
+        clinics.sort((a, b) {
+          final distanceA = _calculateDistance(a);
+          final distanceB = _calculateDistance(b);
+          return distanceA.compareTo(distanceB);
+        });
+      }
+      
+      setState(() {
+        _userProfile = profile;
+        _pets = pets;
+        _nearbyClinics = clinics.take(2).toList(); // Show only 2 nearest
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _userProfile = profile;
+        _pets = pets;
+        _isLoading = false;
+      });
+    }
+  }
+  
+  double _calculateDistance(Clinic clinic) {
+    if (_userPosition == null) return 0;
+    
+    final clinicLat = double.tryParse(clinic.latitude ?? '0') ?? 0.0;
+    final clinicLng = double.tryParse(clinic.longitude ?? '0') ?? 0.0;
+    
+    return _locationService.calculateDistance(
+      _userPosition!.latitude,
+      _userPosition!.longitude,
+      clinicLat,
+      clinicLng,
+    );
   }
 
   Future<void> _handleLogout() async {
@@ -249,12 +298,17 @@ class _HomePageState extends State<HomePage> {
                           ),
                           TextButton(
                             onPressed: () {
-                              // TODO: Navigate to clinics
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ClinicsListPage(),
+                                ),
+                              );
                             },
                             child: const Row(
                               children: [
                                 Text(
-                                  'Edit',
+                                  'View All',
                                   style: TextStyle(
                                     color: Color(0xFF26B5A4),
                                     fontSize: 14,
@@ -268,23 +322,40 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _buildClinicCard(
-                        'PetCare Veterinary Clinic',
-                        '123 Main Street, Istanbul',
-                        '1.2 km',
-                        'General Care, Surgery',
-                        4.8,
-                        true,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildClinicCard(
-                        'Happy Paws Animal Hospital',
-                        '456 Oak Avenue, Istanbul',
-                        '2.8 km',
-                        'General Care, Vaccination',
-                        4.5,
-                        true,
-                      ),
+                      if (_nearbyClinics.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(32),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.location_off,
+                                  size: 48,
+                                  color: Color(0xFF7F8C8D),
+                                ),
+                                SizedBox(height: 12),
+                                Text(
+                                  'No clinics found',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7F8C8D),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        ..._nearbyClinics.map((clinic) => Column(
+                          children: [
+                            _buildClinicCard(clinic),
+                            const SizedBox(height: 12),
+                          ],
+                        )),
                       const SizedBox(height: 80), // Bottom navigation spacing
                     ],
                   ),
@@ -431,105 +502,167 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildClinicCard(
-    String name,
-    String address,
-    String distance,
-    String services,
-    double rating,
-    bool isFammoPartner,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildClinicCard(Clinic clinic) {
+    final distance = _userPosition != null
+        ? _locationService.formatDistance(_calculateDistance(clinic))
+        : '';
+    
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClinicDetailsPage(clinicId: clinic.id),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C3E50),
-                  ),
-                ),
-              ),
-              if (isFammoPartner)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5F3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'FAMMO Partner',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Color(0xFF26B5A4),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              const SizedBox(width: 8),
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    rating.toString(),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            address,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFF7F8C8D),
+          // Clinic Logo
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5F3),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: clinic.logo != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      clinic.logo!,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.local_hospital,
+                          size: 30,
+                          color: Color(0xFF26B5A4),
+                        );
+                      },
+                    ),
+                  )
+                : const Icon(
+                    Icons.local_hospital,
+                    size: 30,
+                    color: Color(0xFF26B5A4),
+                  ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: 14, color: Color(0xFF7F8C8D)),
-              const SizedBox(width: 4),
-              Text(
-                distance,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF7F8C8D),
+          const SizedBox(width: 16),
+          // Clinic Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              clinic.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2C3E50),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (clinic.adminApproved) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF4CAF50),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                size: 12,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (clinic.clinicEoi)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF26B5A4),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'Partner',
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              const Icon(Icons.medical_services, size: 14, color: Color(0xFF7F8C8D)),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  services,
+                const SizedBox(height: 4),
+                Text(
+                  clinic.address.isNotEmpty ? clinic.address : clinic.city,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 13,
                     color: Color(0xFF7F8C8D),
                   ),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    if (distance.isNotEmpty) ...[
+                      const Icon(Icons.location_on, size: 14, color: Color(0xFF7F8C8D)),
+                      const SizedBox(width: 4),
+                      Text(
+                        distance,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF7F8C8D),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    if (clinic.phone.isNotEmpty) ...[
+                      const Icon(Icons.phone, size: 14, color: Color(0xFF7F8C8D)),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          clinic.phone,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF7F8C8D),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right, color: Color(0xFF95A5A6)),
         ],
+        ),
       ),
     );
   }
@@ -578,6 +711,13 @@ class _HomePageState extends State<HomePage> {
           if (result == true && mounted) {
             _loadData();
           }
+        } else if (label == 'Clinics') {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ClinicsListPage(),
+            ),
+          );
         }
         // TODO: Navigate to other pages
       },

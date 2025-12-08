@@ -5,7 +5,7 @@ import '../services/language_service.dart';
 import '../services/config_service.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
-import 'signup_page.dart';
+import 'registration_type_page.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -418,7 +418,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SignUpPage(),
+                            builder: (context) => const RegistrationTypePage(),
                           ),
                         );
                       },

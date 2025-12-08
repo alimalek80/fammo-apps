@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'pages/language_selection_page.dart';
 import 'pages/login_page.dart';
+import 'pages/clinics_list_page.dart';
+import 'pages/my_clinic_page.dart';
+import 'pages/add_edit_clinic_page.dart';
 import 'services/language_service.dart';
 import 'services/config_service.dart';
 import 'services/deep_link_service.dart';
@@ -150,6 +153,9 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/language': (context) => const LanguageSelectionPage(),
         '/login': (context) => const LoginPage(),
+        '/clinics': (context) => const ClinicsListPage(),
+        '/my-clinic': (context) => const MyClinicPage(),
+        '/add-clinic': (context) => const AddEditClinicPage(),
       },
     );
   }
