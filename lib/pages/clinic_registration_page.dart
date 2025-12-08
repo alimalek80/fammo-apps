@@ -264,17 +264,52 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
       print('Response Status: ${clinicResponse.statusCode}');
       print('Response Body: ${clinicResponse.body}');
 
-      if (clinicResponse.statusCode != 201 && clinicResponse.statusCode != 200) {
+      if (clinicResponse.statusCode == 400) {
+        // Handle validation errors (400 Bad Request)
         try {
-          final error = jsonDecode(clinicResponse.body);
-          throw Exception(
-            'Clinic registration failed: HTTP ${clinicResponse.statusCode} -> ${error.toString()}',
-          );
+          final errors = jsonDecode(clinicResponse.body);
+          String errorMessage = '';
+          
+          // Build error message from the response
+          if (errors is Map<String, dynamic>) {
+            List<String> errorList = [];
+            errors.forEach((key, value) {
+              if (value is String) {
+                errorList.add(value);
+              } else if (value is List) {
+                errorList.addAll(value.map((e) => e.toString()));
+              }
+            });
+            errorMessage = errorList.join('\n');
+          } else {
+            errorMessage = errors.toString();
+          }
+
+          if (mounted) {
+            _showErrorDialog(errorMessage);
+          }
+          return;
         } catch (e) {
-          throw Exception(
-            'Clinic registration failed: HTTP ${clinicResponse.statusCode} -> ${clinicResponse.body}',
-          );
+          print('Error parsing 400 response: $e');
+          if (mounted) {
+            _showErrorDialog('Validation error: ${clinicResponse.body}');
+          }
+          return;
         }
+      } else if (clinicResponse.statusCode != 201 && clinicResponse.statusCode != 200) {
+        // Handle other errors (500, 503, etc.)
+        String errorMessage = 'Registration failed. Please try again later.';
+        
+        if (clinicResponse.statusCode == 500) {
+          errorMessage = 'Server error. Please contact support if this continues.';
+        } else if (clinicResponse.statusCode == 503) {
+          errorMessage = 'Service temporarily unavailable. Please try again later.';
+        }
+        
+        if (mounted) {
+          _showErrorDialog(errorMessage);
+        }
+        return;
       }
 
       final clinic = jsonDecode(clinicResponse.body);
@@ -286,8 +321,12 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
 
       setState(() {
         _isLoading = false;
-        _message = "Registration successful! Please check your email for confirmation.";
       });
+
+      // Show success dialog
+      if (mounted) {
+        _showSuccessDialog();
+      }
 
     } catch (e) {
       setState(() {
@@ -297,6 +336,201 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
     }
   }
 
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 48),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Registration Complete!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Thank you for registering your clinic!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF2C3E50),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0F7F4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.mail, color: Color(0xFF26B5A4), size: 40),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Check your email for confirmation',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C3E50),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'We\'ve sent a confirmation link to verify your email address. Please click the link to activate your clinic account.',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF7F8C8D),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                        Navigator.of(context).pushReplacementNamed('/login'); // Go to login
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF26B5A4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Go to Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Registration Error',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFE5E5),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          errorMessage,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF2C3E50),
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade600,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Try Again',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 
   Widget _buildStep1() {
