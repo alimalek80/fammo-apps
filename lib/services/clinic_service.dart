@@ -38,7 +38,7 @@ class ClinicService {
     bool? showAll,
     String? city,
     bool? eoi,
-    bool? emailConfirmed,
+    bool? verifiedEmail,
   }) async {
     try {
       final baseUrl = await _getBaseUrl();
@@ -47,7 +47,7 @@ class ClinicService {
           if (showAll != null) 'show_all': showAll.toString(),
           if (city != null) 'city': city,
           if (eoi != null) 'eoi': eoi.toString(),
-          if (emailConfirmed != null) 'email_confirmed': emailConfirmed.toString(),
+          if (verifiedEmail != null) 'verified_email': verifiedEmail.toString(),
         },
       );
 

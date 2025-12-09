@@ -7,6 +7,7 @@ import 'clinic_details_page.dart';
 import 'home_page.dart';
 import 'pets_list_page.dart';
 import 'clinic_registration_page.dart';
+import 'registration_type_page.dart';
 
 class ClinicsListPage extends StatefulWidget {
   const ClinicsListPage({super.key});
@@ -64,7 +65,21 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
       _errorMessage = '';
     });
     try {
-      final clinics = await _clinicService.listClinics(city: _selectedCity, eoi: _eoiFilter);
+      final clinics = await _clinicService.listClinics(
+        city: _selectedCity,
+        eoi: _eoiFilter,
+        verifiedEmail: true, // Only get clinics with verified email
+      );
+      
+      // Sort by distance if user location is available
+      if (_userPosition != null) {
+        clinics.sort((a, b) {
+          final distanceA = _calculateDistance(a);
+          final distanceB = _calculateDistance(b);
+          return distanceA.compareTo(distanceB);
+        });
+      }
+      
       setState(() {
         _clinics = clinics;
         _filteredClinics = clinics;
@@ -163,7 +178,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ClinicRegistrationPage(),
+                            builder: (context) => const RegistrationTypePage(),
                           ),
                         );
                       },
@@ -235,6 +250,15 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
       _filteredClinics = _clinics
           .where((clinic) => clinic.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
+      
+      // Re-sort by distance after filtering
+      if (_userPosition != null) {
+        _filteredClinics.sort((a, b) {
+          final distanceA = _calculateDistance(a);
+          final distanceB = _calculateDistance(b);
+          return distanceA.compareTo(distanceB);
+        });
+      }
     });
   }
 
@@ -271,161 +295,163 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ClinicDetailsPage(clinicId: clinic.id),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Clinic Logo
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5F3),
-                  borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        children: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ClinicDetailsPage(clinicId: clinic.id),
                 ),
-                child: clinic.logo != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          clinic.logo!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildDefaultLogo();
-                          },
-                        ),
-                      )
-                    : _buildDefaultLogo(),
-              ),
-              const SizedBox(width: 16),
-              // Clinic Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              );
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Clinic Logo
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5F3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: clinic.logo != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              clinic.logo!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildDefaultLogo();
+                              },
+                            ),
+                          )
+                        : _buildDefaultLogo(),
+                  ),
+                  const SizedBox(width: 16),
+                  // Clinic Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  clinic.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      clinic.name,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF2C3E50),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (clinic.adminApproved) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF4CAF50),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.check,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: Color(0xFFFFA500),
+                                ),
+                                const SizedBox(width: 4),
+                                const Text(
+                                  '4.8',
+                                  style: TextStyle(
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF2C3E50),
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (clinic.adminApproved) ...[
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF4CAF50),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.check,
-                                    size: 12,
-                                    color: Colors.white,
-                                  ),
                                 ),
                               ],
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              size: 16,
-                              color: Color(0xFFFFA500),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              '4.8',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF2C3E50),
-                              ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    if (clinic.clinicEoi)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF26B5A4),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'FAMO Partner',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(height: 4),
+                        if (clinic.clinicEoi)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF26B5A4),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'FAMO Partner',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    const SizedBox(height: 8),
-                    Text(
-                      clinic.address.isNotEmpty ? clinic.address : clinic.city,
-                      style: const TextStyle(
-                        color: Color(0xFF7F8C8D),
-                        fontSize: 13,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Color(0xFF7F8C8D),
-                        ),
-                        const SizedBox(width: 4),
+                        const SizedBox(height: 8),
                         Text(
-                          _userPosition != null
-                              ? _locationService.formatDistance(_calculateDistance(clinic))
-                              : 'Location unavailable',
+                          clinic.address.isNotEmpty ? clinic.address : clinic.city,
                           style: const TextStyle(
                             color: Color(0xFF7F8C8D),
-                            fontSize: 12,
+                            fontSize: 13,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 16),
-                        if (clinic.phone.isNotEmpty) ...[
-                          const Icon(
-                            Icons.phone,
-                            size: 14,
-                            color: Color(0xFF7F8C8D),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            clinic.phone,
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: Color(0xFF7F8C8D),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _userPosition != null
+                                  ? _locationService.formatDistance(_calculateDistance(clinic))
+                                  : 'Location unavailable',
+                              style: const TextStyle(
+                                color: Color(0xFF7F8C8D),
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            if (clinic.phone.isNotEmpty) ...[
+                              const Icon(
+                                Icons.phone,
+                                size: 14,
+                                color: Color(0xFF7F8C8D),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                clinic.phone,
                             style: const TextStyle(
                               color: Color(0xFF7F8C8D),
                               fontSize: 12,
@@ -475,6 +501,8 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

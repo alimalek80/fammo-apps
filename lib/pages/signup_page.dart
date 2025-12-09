@@ -219,65 +219,18 @@ class _SignUpPageState extends State<SignUpPage> {
                   },
                 ),
                 const SizedBox(height: 24),
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Register as:',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: const Text('Pet Owner'),
-                              value: 'petowner',
-                              groupValue: _selectedRole,
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedRole = value!;
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: const Text('Clinic Owner'),
-                              value: 'clinicowner',
-                              groupValue: _selectedRole,
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedRole = value!;
-                                });
-                                Future.delayed(const Duration(milliseconds: 200), () {
-                                  Navigator.pushReplacementNamed(context, '/clinic-registration');
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                Text(
+                  localizations.signUp,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
                   ),
                 ),
-                const SizedBox(height: 24),
-                ...(_selectedRole == 'petowner'
-                    ? [
-                        Text(
-                          localizations.signUp,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Container(
-                          constraints: const BoxConstraints(maxWidth: 400),
-                          child: TextField(
+                const SizedBox(height: 32),
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: TextField(
                             controller: emailCtrl,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
@@ -454,8 +407,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ],
                         ),
-                      ]
-                    : []),
               ],
             ),
           ),
