@@ -7,6 +7,7 @@ import 'pages/add_edit_clinic_page.dart';
 import 'services/language_service.dart';
 import 'services/config_service.dart';
 import 'services/deep_link_service.dart';
+import 'services/clinic_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +38,9 @@ class _MyAppState extends State<MyApp> {
   void _initializeDeepLinks() {
     _deepLinkService.initialize((Uri uri) {
       print('Deep link received: $uri');
+      print('Path: ${uri.path}');
       
+      // Handle user account activation: fammo://login?activated=true&email=...
       if (uri.scheme == 'fammo' && uri.host == 'login') {
         bool activated = uri.queryParameters['activated'] == 'true';
         String? email = uri.queryParameters['email'];
@@ -51,6 +54,239 @@ class _MyAppState extends State<MyApp> {
           });
         }
       }
+      
+      // Handle clinic email confirmation with two possible paths:
+      // 1. https://fammo.ai/vets/confirm-email/{clinic_id}/{token}/ (current API response)
+      // 2. https://fammo.ai/en/clinics/confirm-email/{clinic_id}/{token}/ (future format)
+      else if (uri.scheme == 'https' && uri.host == 'fammo.ai') {
+        final pathSegments = uri.pathSegments;
+        
+        // Check for /vets/confirm-email/ pattern
+        if (pathSegments.contains('confirm-email') && pathSegments.contains('vets')) {
+          final confirmEmailIndex = pathSegments.indexOf('confirm-email');
+          
+          if (confirmEmailIndex != -1 && confirmEmailIndex + 2 < pathSegments.length) {
+            final clinicId = pathSegments[confirmEmailIndex + 1];
+            final token = pathSegments[confirmEmailIndex + 2];
+            
+            print('Clinic email confirmation (vets path) - ID: $clinicId, Token: $token');
+            
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (navigatorKey.currentContext != null) {
+                _handleClinicEmailConfirmation(
+                  navigatorKey.currentContext!,
+                  clinicId,
+                  token,
+                );
+              }
+            });
+          }
+        }
+        
+        // Check for /clinics/confirm-email/ pattern (alternative path)
+        else if (pathSegments.contains('confirm-email') && pathSegments.contains('clinics')) {
+          final confirmEmailIndex = pathSegments.indexOf('confirm-email');
+          
+          if (confirmEmailIndex != -1 && confirmEmailIndex + 2 < pathSegments.length) {
+            final clinicId = pathSegments[confirmEmailIndex + 1];
+            final token = pathSegments[confirmEmailIndex + 2];
+            
+            print('Clinic email confirmation (clinics path) - ID: $clinicId, Token: $token');
+            
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (navigatorKey.currentContext != null) {
+                _handleClinicEmailConfirmation(
+                  navigatorKey.currentContext!,
+                  clinicId,
+                  token,
+                );
+              }
+            });
+          }
+        }
+      }
+    });
+  }
+
+  void _handleClinicEmailConfirmation(BuildContext context, String clinicId, String token) {
+    // Import clinic_service at top of file
+    final clinicService = ClinicService();
+    
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              const Text('Confirming your email...'),
+            ],
+          ),
+        );
+      },
+    );
+    
+    // Call confirmation API
+    clinicService.confirmEmail(token).then((_) {
+      Navigator.of(context).pop(); // Close loading dialog
+      
+      // Show success dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Email Confirmed!',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: const Text(
+              'Your clinic email has been successfully confirmed.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF7F8C8D),
+              ),
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to my clinic page
+                    navigatorKey.currentState?.pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const MyClinicPage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF26B5A4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text(
+                    'Go to My Clinic',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }).catchError((error) {
+      Navigator.of(context).pop(); // Close loading dialog
+      
+      // Show error dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.error,
+                    color: Colors.red,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Confirmation Failed',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Error: $error',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF7F8C8D),
+              ),
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
     });
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/pet_service.dart';
 import 'edit_pet_page.dart';
+import 'meal_recommendation_page.dart';
+import 'health_report_page.dart';
 
 class PetDetailPage extends StatelessWidget {
   final Pet pet;
@@ -161,7 +163,7 @@ class PetDetailPage extends StatelessWidget {
                                   label: 'Generate Nutrition Plan',
                                   color: const Color(0xFF26B5A4),
                                   onTap: () {
-                                    // TODO: Navigate to nutrition plan
+                                    _navigateToMealRecommendation(context);
                                   },
                                 ),
                                 const SizedBox(height: 12),
@@ -170,7 +172,7 @@ class PetDetailPage extends StatelessWidget {
                                   label: 'Generate Health Report',
                                   color: const Color(0xFFFF8A65),
                                   onTap: () {
-                                    // TODO: Navigate to health report
+                                    _navigateToHealthReport(context);
                                   },
                                 ),
                                 const SizedBox(height: 12),
@@ -722,5 +724,29 @@ class PetDetailPage extends StatelessWidget {
       return pet.treatFrequencyDetail!['description'];
     }
     return '';
+  }
+
+  void _navigateToMealRecommendation(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MealRecommendationPage(
+          petId: pet.id,
+          petName: pet.name,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToHealthReport(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HealthReportPage(
+          petId: pet.id,
+          petName: pet.name,
+        ),
+      ),
+    );
   }
 }

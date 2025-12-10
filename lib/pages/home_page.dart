@@ -4,8 +4,12 @@ import '../services/user_service.dart';
 import '../services/pet_service.dart';
 import '../services/clinic_service.dart';
 import '../services/location_service.dart';
+import '../services/config_service.dart';
+import '../services/language_service.dart';
 import '../models/clinic.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'pet_detail_page.dart';
@@ -13,6 +17,7 @@ import 'add_pet_page.dart';
 import 'pets_list_page.dart';
 import 'clinics_list_page.dart';
 import 'clinic_details_page.dart';
+import 'ai_history_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,26 +55,71 @@ class _HomePageState extends State<HomePage> {
     final position = await _locationService.getCurrentPosition();
     _userPosition = position;
     
-    // Get clinics
+    // Get nearby clinics using search endpoint
     try {
-      final clinics = await _clinicService.listClinics();
+      List<Clinic> nearbyClinicsList = [];
       
-      // Sort by distance if location available
       if (_userPosition != null) {
-        clinics.sort((a, b) {
-          final distanceA = _calculateDistance(a);
-          final distanceB = _calculateDistance(b);
-          return distanceA.compareTo(distanceB);
-        });
+        // Use search endpoint with user location
+        final token = await AuthService().getAccessToken();
+        final config = await ConfigService.getConfig();
+        final langCode = await LanguageService().getLocalLanguage() ?? 'en';
+        
+        if (token != null) {
+          final headers = {
+            'Content-Type': 'application/json',
+            'Accept-Language': langCode,
+            'Authorization': 'Bearer $token',
+          };
+          
+          final searchBody = jsonEncode({
+            'latitude': _userPosition!.latitude,
+            'longitude': _userPosition!.longitude,
+            'radius': 200, // 200 km radius to find more clinics
+          });
+          
+          final response = await http.post(
+            Uri.parse('${config.baseUrl}/api/v1/clinics/search/'),
+            headers: headers,
+            body: searchBody,
+          );
+          
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final results = data['results'] as List<dynamic>? ?? [];
+            
+            // Convert to Clinic objects and take top 2
+            nearbyClinicsList = results
+                .take(2)
+                .map((clinic) => Clinic.fromJson(clinic))
+                .toList();
+            
+            print('Found ${results.length} clinics, showing ${nearbyClinicsList.length} nearest');
+          } else {
+            print('Search endpoint error: ${response.statusCode}');
+            // Fallback to list endpoint
+            final clinics = await _clinicService.listClinics();
+            if (clinics.isNotEmpty) {
+              nearbyClinicsList = clinics.take(2).toList();
+            }
+          }
+        }
+      } else {
+        // No location available, use list endpoint
+        final clinics = await _clinicService.listClinics();
+        if (clinics.isNotEmpty) {
+          nearbyClinicsList = clinics.take(2).toList();
+        }
       }
       
       setState(() {
         _userProfile = profile;
         _pets = pets;
-        _nearbyClinics = clinics.take(2).toList(); // Show only 2 nearest
+        _nearbyClinics = nearbyClinicsList;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error loading clinics: $e');
       setState(() {
         _userProfile = profile;
         _pets = pets;
@@ -176,13 +226,31 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          _buildQuickAction('🥗', 'Nutrition\nPlan', Colors.green.shade100),
+                          _buildQuickAction('🥗', 'Nutrition\nPlan', Colors.green.shade100, () {
+                            // Navigate to nutrition
+                          }),
                           const SizedBox(width: 12),
-                          _buildQuickAction('💗', 'Health\nReport', Colors.pink.shade50),
+                          _buildQuickAction('💗', 'Health\nReport', Colors.pink.shade50, () {
+                            // Navigate to health
+                          }),
                           const SizedBox(width: 12),
-                          _buildQuickAction('💬', 'AI Chat', Colors.amber.shade50),
+                          _buildQuickAction('📚', 'AI\nHistory', Colors.amber.shade50, () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AIHistoryPage(),
+                              ),
+                            );
+                          }),
                           const SizedBox(width: 12),
-                          _buildQuickAction('📍', 'Clinics', Colors.blue.shade50),
+                          _buildQuickAction('📍', 'Clinics', Colors.blue.shade50, () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ClinicsListPage(),
+                              ),
+                            );
+                          }),
                         ],
                       ),
                       const SizedBox(height: 32),
@@ -355,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                             _buildClinicCard(clinic),
                             const SizedBox(height: 12),
                           ],
-                        )),
+                        )).toList(),
                       const SizedBox(height: 80), // Bottom navigation spacing
                     ],
                   ),
@@ -366,12 +434,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildQuickAction(String emoji, String label, Color bgColor) {
+  Widget _buildQuickAction(String emoji, String label, Color bgColor, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
-        onTap: () {
-          // TODO: Navigate based on action
-        },
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
