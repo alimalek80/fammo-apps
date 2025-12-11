@@ -28,6 +28,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
   final List<Map<String, String>> fallbackLanguages = [
     {'code': 'en', 'name': 'English', 'nativeName': 'English'},
     {'code': 'tr', 'name': 'Turkish', 'nativeName': 'Türkçe'},
+    {'code': 'nl', 'name': 'Dutch', 'nativeName': 'Nederlands'},
     {'code': 'fi', 'name': 'Finnish', 'nativeName': 'Suomi'},
   ];
 
@@ -107,6 +108,8 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
         return 'GB';
       case 'tr':
         return 'TR';
+      case 'nl':
+        return 'NL';
       case 'fi':
         return 'FI';
       default:

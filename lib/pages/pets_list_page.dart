@@ -3,6 +3,7 @@ import '../services/pet_service.dart';
 import '../services/auth_service.dart';
 import 'pet_detail_page.dart';
 import 'add_pet_page.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 class PetsListPage extends StatefulWidget {
   const PetsListPage({super.key});
@@ -234,6 +235,7 @@ class _PetsListPageState extends State<PetsListPage> {
                 ],
               ),
             ),
+      bottomNavigationBar: const BottomNavBar(activePage: 'Pets'),
     );
   }
 

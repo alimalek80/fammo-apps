@@ -79,4 +79,41 @@ class AuthService {
     await storage.delete(key: "access");
     await storage.delete(key: "refresh");
   }
+
+  // Refresh access token using refresh token
+  Future<bool> refreshAccessToken() async {
+    try {
+      final refreshToken = await storage.read(key: 'refresh');
+      if (refreshToken == null) {
+        print('No refresh token available');
+        return false;
+      }
+
+      final baseUrl = await _getBaseUrl();
+      final url = Uri.parse('$baseUrl/api/v1/auth/token/refresh/');
+
+      print('Attempting to refresh access token');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'refresh': refreshToken}),
+      );
+
+      print('Token refresh response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await storage.write(key: 'access', value: data['access']);
+        print('Access token refreshed successfully');
+        return true;
+      }
+
+      print('Token refresh failed with status: ${response.statusCode}');
+      return false;
+    } catch (e) {
+      print('Error refreshing token: $e');
+      return false;
+    }
+  }
 }

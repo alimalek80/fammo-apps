@@ -177,7 +177,8 @@ class _AddEditClinicPageState extends State<AddEditClinicPage> {
         savedClinic = await _clinicService.registerClinic(clinicData);
       } else {
         // Update existing clinic
-        savedClinic = await _clinicService.updateClinic(widget.clinic!.id, clinicData);
+        await _clinicService.updateClinic(widget.clinic!.id, clinicData);
+        savedClinic = widget.clinic!; // Use existing clinic for ID
       }
 
       // Update working hours

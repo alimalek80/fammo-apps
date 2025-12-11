@@ -16,6 +16,9 @@ class UserProfile {
   final String? language;
   final double? latitude;
   final double? longitude;
+  final bool isClinicOwner;
+  final List<OwnedClinic> ownedClinics;
+  final bool locationConsent;
 
   UserProfile({
     required this.id,
@@ -30,6 +33,9 @@ class UserProfile {
     this.language,
     this.latitude,
     this.longitude,
+    this.isClinicOwner = false,
+    this.ownedClinics = const [],
+    this.locationConsent = false,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -46,7 +52,28 @@ class UserProfile {
       language: json['preferred_language'],
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
+      isClinicOwner: json['is_clinic_owner'] ?? false,
+      ownedClinics: json['owned_clinics'] != null
+          ? (json['owned_clinics'] as List)
+              .map((c) => OwnedClinic.fromJson(c))
+              .toList()
+          : [],
+      locationConsent: json['location_consent'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'first_name': firstName,
+      'last_name': lastName,
+      'phone': phone,
+      'address': address,
+      'city': city,
+      'zip_code': zipCode,
+      'country': country,
+      'location_consent': locationConsent,
+      'preferred_language': language,
+    };
   }
 
   String get fullName {
@@ -54,6 +81,20 @@ class UserProfile {
       return email.split('@')[0];
     }
     return '$firstName $lastName'.trim();
+  }
+}
+
+class OwnedClinic {
+  final int id;
+  final String name;
+
+  OwnedClinic({required this.id, required this.name});
+
+  factory OwnedClinic.fromJson(Map<String, dynamic> json) {
+    return OwnedClinic(
+      id: json['id'],
+      name: json['name'],
+    );
   }
 }
 
@@ -89,6 +130,43 @@ class UserService {
       return null;
     } catch (e) {
       print('Error fetching user profile: $e');
+      return null;
+    }
+  }
+
+  Future<UserProfile?> updateUserProfile(UserProfile profile) async {
+    final baseUrl = await ConfigService.getBaseUrl();
+    final accessToken = await _authService.getAccessToken();
+
+    if (accessToken == null) return null;
+
+    final url = Uri.parse('$baseUrl/api/v1/me/');
+
+    try {
+      final bodyData = profile.toJson();
+      print('Sending update request to: $url');
+      print('Request body: ${jsonEncode(bodyData)}');
+      
+      final response = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(bodyData),
+      );
+
+      print('Update user profile status: ${response.statusCode}');
+      print('Update response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return UserProfile.fromJson(data);
+      }
+
+      return null;
+    } catch (e) {
+      print('Error updating user profile: $e');
       return null;
     }
   }

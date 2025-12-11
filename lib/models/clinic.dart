@@ -219,11 +219,30 @@ class WorkingHoursSchedule {
 
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id,
       'day_of_week': dayOfWeek,
       'is_closed': isClosed,
       'open_time': openTime,
       'close_time': closeTime,
     };
+  }
+
+  WorkingHoursSchedule copyWith({
+    int? id,
+    int? dayOfWeek,
+    String? dayName,
+    bool? isClosed,
+    String? openTime,
+    String? closeTime,
+  }) {
+    return WorkingHoursSchedule(
+      id: id ?? this.id,
+      dayOfWeek: dayOfWeek ?? this.dayOfWeek,
+      dayName: dayName ?? this.dayName,
+      isClosed: isClosed ?? this.isClosed,
+      openTime: openTime ?? this.openTime,
+      closeTime: closeTime ?? this.closeTime,
+    );
   }
 
   static String getDayName(int dayOfWeek) {

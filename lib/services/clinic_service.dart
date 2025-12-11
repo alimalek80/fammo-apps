@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/clinic.dart';
@@ -139,10 +140,13 @@ class ClinicService {
   }
 
   // 5. Update Clinic (PATCH for partial update)
-  Future<Clinic> updateClinic(int clinicId, Map<String, dynamic> updates) async {
+  Future<void> updateClinic(int clinicId, Map<String, dynamic> updates) async {
     try {
       final baseUrl = await _getBaseUrl();
       final url = Uri.parse("$baseUrl/api/v1/clinics/$clinicId/");
+
+      print('Updating clinic at: $url');
+      print('Request body: ${jsonEncode(updates)}');
 
       final response = await http.patch(
         url,
@@ -150,14 +154,77 @@ class ClinicService {
         body: jsonEncode(updates),
       );
 
-      if (response.statusCode == 200) {
-        return Clinic.fromJson(jsonDecode(response.body));
-      } else {
+      print('Update clinic status: ${response.statusCode}');
+      print('Update clinic response: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
         final errorData = jsonDecode(response.body);
         throw Exception('Failed to update clinic: $errorData');
       }
+      // Success - no need to return anything since API response is partial
     } catch (e) {
       print('Error updating clinic: $e');
+      rethrow;
+    }
+  }
+
+  // 5.5 Update Working Hours
+  Future<void> updateWorkingHours(
+    int clinicId,
+    List<Map<String, dynamic>> workingHours,
+  ) async {
+    try {
+      final baseUrl = await _getBaseUrl();
+      final url = Uri.parse("$baseUrl/api/v1/clinics/$clinicId/working-hours/");
+
+      print('Updating working hours at: $url');
+      print('Request body: ${jsonEncode(workingHours)}');
+
+      final response = await http.patch(
+        url,
+        headers: await _getHeaders(requireAuth: true),
+        body: jsonEncode(workingHours),
+      );
+
+      print('Update working hours status: ${response.statusCode}');
+      print('Update working hours response: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final errorData = jsonDecode(response.body);
+        throw Exception('Failed to update working hours: $errorData');
+      }
+    } catch (e) {
+      print('Error updating working hours: $e');
+      rethrow;
+    }
+  }
+
+  // 5.6 Upload Clinic Logo
+  Future<void> uploadClinicLogo(int clinicId, File logoFile) async {
+    try {
+      final baseUrl = await _getBaseUrl();
+      final url = Uri.parse("$baseUrl/api/v1/clinics/$clinicId/");
+
+      print('Uploading logo at: $url');
+
+      final request = http.MultipartRequest('PATCH', url);
+      request.headers.addAll(await _getHeaders(requireAuth: true));
+      request.files.add(
+        await http.MultipartFile.fromPath('logo', logoFile.path),
+      );
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      print('Upload logo status: ${response.statusCode}');
+      print('Upload logo response: $responseBody');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final errorData = jsonDecode(responseBody);
+        throw Exception('Failed to upload logo: $errorData');
+      }
+    } catch (e) {
+      print('Error uploading logo: $e');
       rethrow;
     }
   }
@@ -209,34 +276,6 @@ class ClinicService {
   }
 
   // 8. Update Clinic Working Hours (Bulk)
-  Future<List<WorkingHoursSchedule>> updateWorkingHours(
-    int clinicId,
-    List<Map<String, dynamic>> workingHours,
-  ) async {
-    try {
-      final baseUrl = await _getBaseUrl();
-      final url = Uri.parse("$baseUrl/api/v1/clinics/$clinicId/working-hours/");
-
-      final response = await http.post(
-        url,
-        headers: await _getHeaders(requireAuth: true),
-        body: jsonEncode(workingHours),
-      );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        final List<dynamic> hoursData = data['working_hours'];
-        return hoursData.map((json) => WorkingHoursSchedule.fromJson(json)).toList();
-      } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception('Failed to update working hours: $errorData');
-      }
-    } catch (e) {
-      print('Error updating working hours: $e');
-      rethrow;
-    }
-  }
-
   // 9. Get Vet Profile
   Future<VetProfile?> getVetProfile(int clinicId) async {
     try {
@@ -262,7 +301,7 @@ class ClinicService {
   }
 
   // 10. Update Vet Profile
-  Future<VetProfile> updateVetProfile(
+  Future<void> updateVetProfile(
     int clinicId,
     Map<String, dynamic> profileData,
   ) async {
@@ -270,15 +309,19 @@ class ClinicService {
       final baseUrl = await _getBaseUrl();
       final url = Uri.parse("$baseUrl/api/v1/clinics/$clinicId/vet-profile/");
 
-      final response = await http.put(
+      print('Updating vet profile at: $url');
+      print('Request body: ${jsonEncode(profileData)}');
+
+      final response = await http.patch(
         url,
         headers: await _getHeaders(requireAuth: true),
         body: jsonEncode(profileData),
       );
 
-      if (response.statusCode == 200) {
-        return VetProfile.fromJson(jsonDecode(response.body));
-      } else {
+      print('Update vet profile status: ${response.statusCode}');
+      print('Update vet profile response: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
         final errorData = jsonDecode(response.body);
         throw Exception('Failed to update vet profile: $errorData');
       }

@@ -18,6 +18,8 @@ import 'pets_list_page.dart';
 import 'clinics_list_page.dart';
 import 'clinic_details_page.dart';
 import 'ai_history_page.dart';
+import '../widgets/bottom_nav_bar.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -430,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: const BottomNavBar(activePage: 'Home'),
     );
   }
 
@@ -729,82 +731,6 @@ class _HomePageState extends State<HomePage> {
           const Icon(Icons.chevron_right, color: Color(0xFF95A5A6)),
         ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home, 'Home', true),
-              _buildNavItem(Icons.pets, 'Pets', false),
-              _buildNavItem(Icons.location_on, 'Clinics', false),
-              _buildNavItem(Icons.chat_bubble_outline, 'Chat', false),
-              _buildNavItem(Icons.person_outline, 'Profile', false),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return InkWell(
-      onTap: () async {
-        if (label == 'Pets') {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PetsListPage(),
-            ),
-          );
-          
-          if (result == true && mounted) {
-            _loadData();
-          }
-        } else if (label == 'Clinics') {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ClinicsListPage(),
-            ),
-          );
-        }
-        // TODO: Navigate to other pages
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFF26B5A4) : const Color(0xFF7F8C8D),
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF26B5A4) : const Color(0xFF7F8C8D),
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
       ),
     );
   }
