@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
+import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
 import 'edit_profile_page.dart';
 import 'edit_clinic_profile_page.dart';
 import 'edit_clinic_working_hours_page.dart';
 import 'pets_list_page.dart';
+import 'change_password_page.dart';
+import 'notification_settings_page.dart';
+import 'language_settings_page.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -21,6 +25,9 @@ class _ProfilePageState extends State<ProfilePage> {
   
   UserProfile? _userProfile;
   bool _isLoading = true;
+  int _petsCount = 0;
+  int _mealReportsCount = 0;
+  int _healthReportsCount = 0;
 
   @override
   void initState() {
@@ -31,8 +38,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserProfile() async {
     try {
       final profile = await _userService.getUserProfile();
+      
+      // Fetch real stats data
+      final statsData = await _userService.getUserStats();
+      
       setState(() {
         _userProfile = profile;
+        _petsCount = statsData['pets_count'] ?? 0;
+        _mealReportsCount = statsData['meal_reports_count'] ?? 0;
+        _healthReportsCount = statsData['health_reports_count'] ?? 0;
         _isLoading = false;
       });
     } catch (e) {
@@ -50,27 +64,33 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2C3E50),
+    return FutureBuilder<String?>(
+      future: LanguageService().getLocalLanguage(),
+      builder: (context, snapshot) {
+        String languageCode = snapshot.data ?? 'en';
+        AppLocalizations loc = AppLocalizations(languageCode);
+        
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            automaticallyImplyLeading: true,
+            centerTitle: true,
+            title: Text(
+              loc.profile,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
           ),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _userProfile == null
-              ? const Center(child: Text('Failed to load profile'))
-              : SingleChildScrollView(
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _userProfile == null
+                  ? Center(child: Text(loc.failedToLoadProfile))
+                  : SingleChildScrollView(
                   child: Column(
                     children: [
                       // Profile Header
@@ -151,11 +171,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             // Stats Row
                             Row(
                               children: [
-                                _buildStatItem('2', 'Pets'),
+                                _buildStatItem(_petsCount.toString(), loc.pets, loc),
                                 const SizedBox(width: 16),
-                                _buildStatItem('5', 'Plans'),
+                                _buildStatItem(_mealReportsCount.toString(), loc.mealReports, loc),
                                 const SizedBox(width: 16),
-                                _buildStatItem('3', 'Reports'),
+                                _buildStatItem(_healthReportsCount.toString(), loc.healthReports, loc),
                               ],
                             ),
                           ],
@@ -164,11 +184,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 20),
                       // Account Section
                       _buildSection(
-                        title: 'Account',
+                        title: loc.account,
                         children: [
                           _buildMenuItemWithIcon(
                             icon: Icons.person_outline,
-                            title: 'Edit Profile',
+                            title: loc.editProfile,
                             onTap: () async {
                               final result = await Navigator.push(
                                 context,
@@ -185,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           _buildMenuItemWithIcon(
                             icon: Icons.pets,
-                            title: 'Manage Pets',
+                            title: loc.managePets,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -197,9 +217,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           _buildMenuItemWithIcon(
                             icon: Icons.lock_outline,
-                            title: 'Change Password',
+                            title: loc.changePassword,
                             onTap: () {
-                              print('Change Password tapped');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChangePasswordPage(),
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -210,11 +235,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         Column(
                           children: [
                             _buildSection(
-                              title: 'Clinic',
+                              title: loc.clinic,
                               children: [
                                 _buildMenuItemWithIcon(
                                   icon: Icons.store_outlined,
-                                  title: 'Edit Clinic Profile',
+                                  title: loc.editClinicProfile,
                                   onTap: () async {
                                     final result = await Navigator.push(
                                       context,
@@ -236,7 +261,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 _buildMenuItemWithIcon(
                                   icon: Icons.schedule_outlined,
-                                  title: 'Edit Working Hours',
+                                  title: loc.editWorkingHours,
                                   onTap: () async {
                                     final result = await Navigator.push(
                                       context,
@@ -264,20 +289,30 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       // Settings Section
                       _buildSection(
-                        title: 'Settings',
+                        title: loc.settings,
                         children: [
                           _buildMenuItemWithIcon(
                             icon: Icons.notifications_outlined,
-                            title: 'Notifications',
+                            title: loc.notifications,
                             onTap: () {
-                              print('Notifications tapped');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NotificationSettingsPage(),
+                                ),
+                              );
                             },
                           ),
                           _buildMenuItemWithIcon(
                             icon: Icons.language_outlined,
-                            title: 'Language',
+                            title: loc.language,
                             onTap: () {
-                              print('Language tapped');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LanguageSettingsPage(),
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -285,18 +320,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 20),
                       // Legal Section
                       _buildSection(
-                        title: 'Legal',
+                        title: loc.legal,
                         children: [
                           _buildMenuItemWithIcon(
                             icon: Icons.shield_outlined,
-                            title: 'Privacy Policy',
+                            title: loc.privacyPolicy,
                             onTap: () {
                               print('Privacy Policy tapped');
                             },
                           ),
                           _buildMenuItemWithIcon(
                             icon: Icons.description_outlined,
-                            title: 'Terms of Service',
+                            title: loc.termsOfService,
                             onTap: () {
                               print('Terms of Service tapped');
                             },
@@ -321,14 +356,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.logout, color: Colors.red, size: 18),
-                              SizedBox(width: 8),
+                              const Icon(Icons.logout, color: Colors.red, size: 18),
+                              const SizedBox(width: 8),
                               Text(
-                                'Log Out',
-                                style: TextStyle(
+                                loc.logOut,
+                                style: const TextStyle(
                                   color: Colors.red,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -351,7 +386,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-      bottomNavigationBar: const BottomNavBar(activePage: 'Profile'),
+          bottomNavigationBar: const BottomNavBar(activePage: 'Profile'),
+        );
+      },
     );
   }
 
@@ -442,12 +479,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildStatItem(String number, String label) {
+  Widget _buildStatItem(String number, String label, AppLocalizations loc) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: _getStatColor(label),
+          color: _getStatColor(label, loc),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -475,16 +512,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Color _getStatColor(String label) {
-    switch (label) {
-      case 'Pets':
-        return const Color(0xFFD4F1E8);
-      case 'Plans':
-        return const Color(0xFFFFE5D9);
-      case 'Reports':
-        return const Color(0xFFFFF5D9);
-      default:
-        return const Color(0xFFE8E8E8);
+  Color _getStatColor(String label, AppLocalizations loc) {
+    if (label == loc.pets) {
+      return const Color(0xFFD4F1E8);
+    } else if (label == loc.mealReports) {
+      return const Color(0xFFFFE5D9);
+    } else if (label == loc.healthReports) {
+      return const Color(0xFFFFF5D9);
+    } else {
+      return const Color(0xFFE8E8E8);
     }
   }
 }

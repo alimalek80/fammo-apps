@@ -6,6 +6,7 @@ import '../services/clinic_service.dart';
 import '../services/location_service.dart';
 import '../services/config_service.dart';
 import '../services/language_service.dart';
+import '../services/notification_service.dart';
 import '../models/clinic.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   final PetService _petService = PetService();
   final ClinicService _clinicService = ClinicService();
   final LocationService _locationService = LocationService();
+  final NotificationService _notificationService = NotificationService();
   
   UserProfile? _userProfile;
   List<Pet> _pets = [];
@@ -44,7 +46,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _requestNotificationPermissionIfNeeded();
     _loadData();
+  }
+
+  /// Request notification permission on first app launch
+  Future<void> _requestNotificationPermissionIfNeeded() async {
+    try {
+      final hasBeenAsked = await _notificationService.hasPermissionBeenAsked();
+      
+      if (!hasBeenAsked) {
+        // Request permission on first app launch
+        await _notificationService.requestNotificationPermission();
+      }
+    } catch (e) {
+      print('Error requesting notification permission: $e');
+    }
   }
 
   Future<void> _loadData() async {
@@ -158,6 +175,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations(
+      _userProfile?.email ?? 'en'
+    ); // This will be updated properly after we get language
+    
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5F3),
       body: _isLoading
@@ -176,12 +197,19 @@ class _HomePageState extends State<HomePage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Welcome back,',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF7F8C8D),
-                                ),
+                              FutureBuilder<String?>(
+                                future: LanguageService().getLocalLanguage(),
+                                builder: (context, snapshot) {
+                                  final lang = snapshot.data ?? 'en';
+                                  final loc = AppLocalizations(lang);
+                                  return Text(
+                                    '${loc.hello},',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFF7F8C8D),
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 4),
                               Row(
@@ -207,53 +235,74 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        "Let's take care of your pets today",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF7F8C8D),
-                        ),
+                      FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Text(
+                            loc.explore,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF7F8C8D),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
 
                       // Quick Actions
-                      const Text(
-                        'Quick Actions',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
-                        ),
+                      FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Text(
+                            loc.quickActions,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2C3E50),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildQuickAction('🥗', 'Nutrition\nPlan', Colors.green.shade100, () {
-                            // Navigate to nutrition
-                          }),
-                          const SizedBox(width: 12),
-                          _buildQuickAction('💗', 'Health\nReport', Colors.pink.shade50, () {
-                            // Navigate to health
-                          }),
-                          const SizedBox(width: 12),
-                          _buildQuickAction('📚', 'AI\nHistory', Colors.amber.shade50, () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AIHistoryPage(),
-                              ),
-                            );
-                          }),
-                          const SizedBox(width: 12),
-                          _buildQuickAction('📍', 'Clinics', Colors.blue.shade50, () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ClinicsListPage(),
-                              ),
-                            );
-                          }),
-                        ],
+                      FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Row(
+                            children: [
+                              _buildQuickAction('🥗', loc.nutritionPlan, Colors.green.shade100, () {
+                                // Navigate to nutrition
+                              }),
+                              const SizedBox(width: 12),
+                              _buildQuickAction('💗', loc.healthReport, Colors.pink.shade50, () {
+                                // Navigate to health
+                              }),
+                              const SizedBox(width: 12),
+                              _buildQuickAction('📚', loc.aiHistory, Colors.amber.shade50, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AIHistoryPage(),
+                                  ),
+                                );
+                              }),
+                              const SizedBox(width: 12),
+                              _buildQuickAction('📍', loc.clinics, Colors.blue.shade50, () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ClinicsListPage(),
+                                  ),
+                                );
+                              }),
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 32),
 
@@ -261,13 +310,20 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'My Pets',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2C3E50),
-                            ),
+                          FutureBuilder<String?>(
+                            future: LanguageService().getLocalLanguage(),
+                            builder: (context, snapshot) {
+                              final lang = snapshot.data ?? 'en';
+                              final loc = AppLocalizations(lang);
+                              return Text(
+                                loc.yourPets,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2C3E50),
+                                ),
+                              );
+                            },
                           ),
                           TextButton(
                             onPressed: () async {
@@ -282,18 +338,25 @@ class _HomePageState extends State<HomePage> {
                                 _loadData();
                               }
                             },
-                            child: const Row(
-                              children: [
-                                Text(
-                                  'Edit',
-                                  style: TextStyle(
-                                    color: Color(0xFF26B5A4),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
-                              ],
+                            child: FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                return Row(
+                                  children: [
+                                    Text(
+                                      loc.edit,
+                                      style: const TextStyle(
+                                        color: Color(0xFF26B5A4),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -308,15 +371,29 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Center(
-                            child: Text(
-                              'No pets yet. Add your first pet!',
-                              style: TextStyle(color: Color(0xFF7F8C8D)),
+                          child: Center(
+                            child: FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                return Text(
+                                  loc.addFirstPet,
+                                  style: const TextStyle(color: Color(0xFF7F8C8D)),
+                                );
+                              },
                             ),
                           ),
                         )
                       else
-                        ...(_pets.map((pet) => _buildPetCard(pet))),
+                        ...(_pets.map((pet) => FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                return _buildPetCard(pet, loc);
+                              },
+                            ))),
                       
                       const SizedBox(height: 12),
                       // Add Pet Button
@@ -340,14 +417,21 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Center(
-                            child: Text(
-                              '+ Add Pet',
-                              style: TextStyle(
-                                color: Color(0xFF26B5A4),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          child: Center(
+                            child: FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                return Text(
+                                  '+ ${loc.addNewPet}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF26B5A4),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -358,13 +442,20 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Nearby Clinics',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2C3E50),
-                            ),
+                          FutureBuilder<String?>(
+                            future: LanguageService().getLocalLanguage(),
+                            builder: (context, snapshot) {
+                              final lang = snapshot.data ?? 'en';
+                              final loc = AppLocalizations(lang);
+                              return Text(
+                                loc.nearbyClinics,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2C3E50),
+                                ),
+                              );
+                            },
                           ),
                           TextButton(
                             onPressed: () {
@@ -375,18 +466,25 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             },
-                            child: const Row(
-                              children: [
-                                Text(
-                                  'View All',
-                                  style: TextStyle(
-                                    color: Color(0xFF26B5A4),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
-                              ],
+                            child: FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                return Row(
+                                  children: [
+                                    Text(
+                                      loc.seeAll,
+                                      style: const TextStyle(
+                                        color: Color(0xFF26B5A4),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -466,7 +564,44 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPetCard(Pet pet) {
+  String _getLocalizedAge(Pet pet, AppLocalizations loc) {
+    // Use the age_display from API if it's in the correct language (future enhancement)
+    // For now, format locally with localization
+    
+    if (pet.ageYears == null && pet.ageMonths == null && pet.ageWeeks == null) {
+      return '${loc.age} unknown';
+    }
+    
+    List<String> ageParts = [];
+    
+    if (pet.ageYears != null && pet.ageYears! > 0) {
+      if (pet.ageYears == 1) {
+        ageParts.add('${pet.ageYears} ${loc.year}');
+      } else {
+        ageParts.add('${pet.ageYears} ${loc.years}');
+      }
+    }
+    
+    if (pet.ageMonths != null && pet.ageMonths! > 0) {
+      if (pet.ageMonths == 1) {
+        ageParts.add('${pet.ageMonths} ${loc.month}');
+      } else {
+        ageParts.add('${pet.ageMonths} ${loc.months}');
+      }
+    }
+    
+    if (pet.ageWeeks != null && pet.ageWeeks! > 0 && (pet.ageYears == null || pet.ageYears! == 0) && (pet.ageMonths == null || pet.ageMonths! == 0)) {
+      if (pet.ageWeeks == 1) {
+        ageParts.add('${pet.ageWeeks} ${loc.week}');
+      } else {
+        ageParts.add('${pet.ageWeeks} ${loc.weeks}');
+      }
+    }
+    
+    return ageParts.isEmpty ? '${loc.age} unknown' : ageParts.join(' ');
+  }
+
+  Widget _buildPetCard(Pet pet, AppLocalizations loc) {
     return InkWell(
       onTap: () async {
         final result = await Navigator.push(
@@ -545,7 +680,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${pet.displayBreed}${pet.displayAge.isNotEmpty ? ' • ${pet.displayAge}' : ''}',
+                    '${pet.displayBreed} • ${_getLocalizedAge(pet, loc)}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFF7F8C8D),

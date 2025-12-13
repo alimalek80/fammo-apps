@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
+import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -53,12 +54,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _saveProfile() async {
     // Validate required fields
     if (_firstNameController.text.isEmpty || _lastNameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('First name and last name are required'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      final languageCode = await LanguageService().getLocalLanguage() ?? 'en';
+      final loc = AppLocalizations(languageCode);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(loc.firstNameLastNameRequired),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
@@ -86,17 +92,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final result = await _userService.updateUserProfile(updatedProfile);
 
       if (result != null && mounted) {
+        final languageCode = await LanguageService().getLocalLanguage() ?? 'en';
+        final loc = AppLocalizations(languageCode);
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
+          SnackBar(
+            content: Text(loc.profileUpdatedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context, true);
       } else if (mounted) {
+        final languageCode = await LanguageService().getLocalLanguage() ?? 'en';
+        final loc = AppLocalizations(languageCode);
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to update profile. Please check the logs for more details.'),
+          SnackBar(
+            content: Text(loc.failedToUpdateProfile),
             backgroundColor: Colors.red,
           ),
         );
@@ -120,23 +132,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        title: const Text(
-          'Edit Profile',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2C3E50),
+    return FutureBuilder<String?>(
+      future: LanguageService().getLocalLanguage(),
+      builder: (context, snapshot) {
+        String languageCode = snapshot.data ?? 'en';
+        AppLocalizations loc = AppLocalizations(languageCode);
+        
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            automaticallyImplyLeading: true,
+            centerTitle: true,
+            title: Text(
+              loc.editProfileTitle,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
+          body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -153,7 +171,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Personal Information',
+                      loc.personalInformation,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF2C3E50),
@@ -162,22 +180,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 16),
                     _buildTextField(
                       controller: _firstNameController,
-                      label: 'First Name',
-                      hint: 'Enter your first name',
+                      label: loc.firstName,
+                      hint: loc.enterFirstName,
                       icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
                       controller: _lastNameController,
-                      label: 'Last Name',
-                      hint: 'Enter your last name',
+                      label: loc.lastName,
+                      hint: loc.enterLastName,
                       icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
                       controller: _phoneController,
-                      label: 'Phone Number',
-                      hint: 'Enter your phone number',
+                      label: loc.phoneNumber,
+                      hint: loc.enterPhoneNumber,
                       icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
                     ),
@@ -196,7 +214,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Address Information',
+                      loc.addressInformation,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF2C3E50),
@@ -205,16 +223,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 16),
                     _buildTextField(
                       controller: _addressController,
-                      label: 'Address',
-                      hint: 'Enter your street address',
+                      label: loc.address,
+                      hint: loc.enterStreetAddress,
                       icon: Icons.location_on_outlined,
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
                       controller: _cityController,
-                      label: 'City',
-                      hint: 'Enter your city',
+                      label: loc.city,
+                      hint: loc.enterCity,
                       icon: Icons.location_city_outlined,
                     ),
                     const SizedBox(height: 12),
@@ -223,8 +241,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         Expanded(
                           child: _buildTextField(
                             controller: _zipCodeController,
-                            label: 'ZIP Code',
-                            hint: 'Enter ZIP code',
+                            label: loc.zipCode,
+                            hint: loc.enterZipCode,
                             icon: Icons.markunread_mailbox_outlined,
                           ),
                         ),
@@ -232,8 +250,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         Expanded(
                           child: _buildTextField(
                             controller: _countryController,
-                            label: 'Country',
-                            hint: 'Enter country',
+                            label: loc.country,
+                            hint: loc.enterCountry,
                             icon: Icons.public_outlined,
                           ),
                         ),
@@ -254,7 +272,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Privacy Settings',
+                      loc.privacySettings,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF2C3E50),
@@ -262,9 +280,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     const SizedBox(height: 12),
                     CheckboxListTile(
-                      title: const Text('Allow Location Storage'),
-                      subtitle: const Text(
-                        'Allow us to store your location for better service recommendations',
+                      title: Text(loc.allowLocationStorage),
+                      subtitle: Text(
+                        loc.locationStorageDescription,
                       ),
                       value: _locationConsent,
                       onChanged: (value) {
@@ -299,9 +317,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Save Changes',
-                          style: TextStyle(
+                      : Text(
+                          loc.saveChanges,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -313,7 +331,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
         ),
-      ),
+          ),
+        );
+      },
     );
   }
 

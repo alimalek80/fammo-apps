@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'config_service.dart';
 import 'auth_service.dart';
+import 'language_service.dart';
 import '../models/pet_models.dart';
 
 class Pet {
@@ -182,11 +183,18 @@ class Pet {
 
 class PetService {
   final AuthService _authService = AuthService();
+  final LanguageService _languageService = LanguageService();
+
+  // Helper method to get language code for Accept-Language header
+  Future<String> _getLanguageCode() async {
+    return await _languageService.getLocalLanguage() ?? 'en';
+  }
 
   // Fetch all pet types
   Future<List<PetType>> getPetTypes() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -198,6 +206,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -216,6 +225,7 @@ class PetService {
   Future<List<Gender>> getGenders() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -227,6 +237,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -245,6 +256,7 @@ class PetService {
   Future<List<AgeCategory>> getAgeCategories({int? petTypeId}) async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -260,6 +272,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -278,6 +291,7 @@ class PetService {
   Future<List<Breed>> getBreeds({int? petTypeId}) async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -293,6 +307,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -311,6 +326,7 @@ class PetService {
   Future<List<FoodType>> getFoodTypes() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -322,6 +338,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -340,6 +357,7 @@ class PetService {
   Future<List<FoodFeeling>> getFoodFeelings() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -351,6 +369,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -369,6 +388,7 @@ class PetService {
   Future<List<FoodImportance>> getFoodImportance() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -380,6 +400,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -398,6 +419,7 @@ class PetService {
   Future<List<BodyType>> getBodyTypes() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -409,6 +431,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -427,6 +450,7 @@ class PetService {
   Future<List<ActivityLevel>> getActivityLevels() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -438,6 +462,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -456,6 +481,7 @@ class PetService {
   Future<List<FoodAllergy>> getFoodAllergies() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -467,6 +493,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -485,6 +512,7 @@ class PetService {
   Future<List<HealthIssue>> getHealthIssues() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -496,6 +524,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -514,6 +543,7 @@ class PetService {
   Future<List<TreatFrequency>> getTreatFrequencies() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -525,6 +555,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 
@@ -543,6 +574,7 @@ class PetService {
   Future<Pet?> createPet(PetFormData formData, {File? imageFile}) async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return null;
 
@@ -602,6 +634,7 @@ class PetService {
           options: Options(
             headers: {
               'Authorization': 'Bearer $accessToken',
+              'Accept-Language': langCode,
             },
           ),
         );
@@ -619,6 +652,7 @@ class PetService {
           headers: {
             'Authorization': 'Bearer $accessToken',
             'Content-Type': 'application/json',
+            'Accept-Language': langCode,
           },
           body: jsonEncode(formData.toJson()),
         );
@@ -642,6 +676,7 @@ class PetService {
   Future<Pet?> updatePet(int petId, PetFormData formData, {File? imageFile}) async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return null;
 
@@ -701,6 +736,7 @@ class PetService {
           options: Options(
             headers: {
               'Authorization': 'Bearer $accessToken',
+              'Accept-Language': langCode,
             },
           ),
         );
@@ -718,6 +754,7 @@ class PetService {
           headers: {
             'Authorization': 'Bearer $accessToken',
             'Content-Type': 'application/json',
+            'Accept-Language': langCode,
           },
           body: jsonEncode(formData.toJson()),
         );
@@ -740,6 +777,7 @@ class PetService {
   Future<List<Pet>> getUserPets() async {
     final baseUrl = await ConfigService.getBaseUrl();
     final accessToken = await _authService.getAccessToken();
+    final langCode = await _getLanguageCode();
 
     if (accessToken == null) return [];
 
@@ -751,6 +789,7 @@ class PetService {
         headers: {
           'Authorization': 'Bearer $accessToken',
           'Content-Type': 'application/json',
+          'Accept-Language': langCode,
         },
       );
 

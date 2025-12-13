@@ -170,4 +170,86 @@ class UserService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>> getUserStats() async {
+    final baseUrl = await ConfigService.getBaseUrl();
+    final accessToken = await _authService.getAccessToken();
+
+    if (accessToken == null) {
+      return {
+        'pets_count': 0,
+        'meal_reports_count': 0,
+        'health_reports_count': 0,
+      };
+    }
+
+    try {
+      final headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      // Fetch pets count
+      final petsResponse = await http.get(
+        Uri.parse('$baseUrl/api/v1/pets/'),
+        headers: headers,
+      );
+
+      // Fetch health reports count
+      final healthResponse = await http.get(
+        Uri.parse('$baseUrl/api/v1/ai/health-reports/'),
+        headers: headers,
+      );
+
+      // Fetch meal recommendations count
+      final mealResponse = await http.get(
+        Uri.parse('$baseUrl/api/v1/ai/recommendations/'),
+        headers: headers,
+      );
+
+      int petsCount = 0;
+      int healthReportsCount = 0;
+      int mealReportsCount = 0;
+
+      // Parse pets count
+      if (petsResponse.statusCode == 200) {
+        final petsData = jsonDecode(petsResponse.body);
+        if (petsData is List) {
+          petsCount = petsData.length;
+        }
+      }
+
+      // Parse health reports count
+      if (healthResponse.statusCode == 200) {
+        final healthData = jsonDecode(healthResponse.body);
+        if (healthData is List) {
+          healthReportsCount = healthData.length;
+        }
+      }
+
+      // Parse meal recommendations count
+      if (mealResponse.statusCode == 200) {
+        final mealData = jsonDecode(mealResponse.body);
+        if (mealData is List) {
+          mealReportsCount = mealData.length;
+        }
+      }
+
+      print('User stats - Pets: $petsCount, Health Reports: $healthReportsCount, Meal Reports: $mealReportsCount');
+
+      return {
+        'pets_count': petsCount,
+        'meal_reports_count': mealReportsCount,
+        'health_reports_count': healthReportsCount,
+      };
+    } catch (e) {
+      print('Error fetching user stats: $e');
+      // Return default values if error occurs
+      return {
+        'pets_count': 0,
+        'meal_reports_count': 0,
+        'health_reports_count': 0,
+      };
+    }
+  }
 }

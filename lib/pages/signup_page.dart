@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 
 import '../services/config_service.dart';
 import '../services/language_service.dart';
+import '../services/legal_documents_service.dart';
 import '../utils/app_localizations.dart';
+import '../widgets/legal_agreements.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -26,7 +28,8 @@ class _SignUpPageState extends State<SignUpPage> {
   String _selectedRole = 'petowner'; // 'petowner' or 'clinicowner'
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _agreedToTerms = false;
+  Map<String, bool> _legalAgreements = {};
+  final LegalDocumentsService _legalService = LegalDocumentsService();
   AppLocalizations? _localizations;
 
   AppLocalizations get localizations => _localizations ?? AppLocalizations('en');
@@ -62,9 +65,20 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
-    if (!_agreedToTerms) {
+    // Validate legal agreements
+    bool hasRequiredAgreements;
+    if (_selectedRole == 'clinicowner') {
+      hasRequiredAgreements = (_legalAgreements['clinicTerms'] ?? false) &&
+                             (_legalAgreements['partnership'] ?? false) &&
+                             (_legalAgreements['privacy'] ?? false);
+    } else {
+      hasRequiredAgreements = (_legalAgreements['terms'] ?? false) &&
+                             (_legalAgreements['privacy'] ?? false);
+    }
+    
+    if (!hasRequiredAgreements) {
       setState(() {
-        message = localizations.agreeTermsRequired;
+        message = localizations.pleaseAcceptRequiredTerms;
       });
       return;
     }
@@ -93,6 +107,9 @@ class _SignUpPageState extends State<SignUpPage> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
+        // Record legal consent after successful registration
+        await _recordLegalConsent();
+        
         setState(() {
           isLoading = false;
         });
@@ -309,27 +326,14 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(height: 16),
                         Container(
                           constraints: const BoxConstraints(maxWidth: 400),
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                value: _agreedToTerms,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _agreedToTerms = value ?? false;
-                                  });
-                                },
-                                activeColor: const Color(0xFF26B5A4),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  localizations.agreeToTerms,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF7F8C8D),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: LegalAgreements(
+                            isClinicRegistration: _selectedRole == 'clinicowner',
+                            onAgreementChanged: (agreements) {
+                              setState(() {
+                                _legalAgreements = agreements;
+                              });
+                            },
+                            initialAgreements: _legalAgreements,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -413,5 +417,22 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _recordLegalConsent() async {
+    try {
+      // For now, just log that consent would be recorded
+      // TODO: Implement proper document ID fetching and consent recording after successful registration
+      if (_selectedRole == 'clinicowner') {
+        debugPrint('Clinic consent recorded for: ${emailCtrl.text}');
+        debugPrint('Agreed to: ${_legalAgreements.keys.where((key) => _legalAgreements[key] == true).join(', ')}');
+      } else {
+        debugPrint('User consent recorded for: ${emailCtrl.text}');
+        debugPrint('Agreed to: ${_legalAgreements.keys.where((key) => _legalAgreements[key] == true).join(', ')}');
+      }
+    } catch (e) {
+      // Log error but don't prevent signup completion
+      debugPrint('Failed to record legal consent: $e');
+    }
   }
 }

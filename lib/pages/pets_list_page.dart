@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/pet_service.dart';
 import '../services/auth_service.dart';
+import '../services/language_service.dart';
+import '../utils/app_localizations.dart';
 import 'pet_detail_page.dart';
 import 'add_pet_page.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -157,13 +159,20 @@ class _PetsListPageState extends State<PetsListPage> {
           icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
           onPressed: () => Navigator.pop(context, true),
         ),
-        title: const Text(
-          'My Pets',
-          style: TextStyle(
-            color: Color(0xFF2C3E50),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        title: FutureBuilder<String?>(
+          future: LanguageService().getLocalLanguage(),
+          builder: (context, snapshot) {
+            final lang = snapshot.data ?? 'en';
+            final loc = AppLocalizations(lang);
+            return Text(
+              loc.yourPets,
+              style: const TextStyle(
+                color: Color(0xFF2C3E50),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         centerTitle: true,
       ),
@@ -212,22 +221,29 @@ class _PetsListPageState extends State<PetsListPage> {
                             ),
                           ],
                         ),
-                        child: const Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.add, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text(
-                                'Add Pet',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        child: FutureBuilder<String?>(
+                          future: LanguageService().getLocalLanguage(),
+                          builder: (context, snapshot) {
+                            final lang = snapshot.data ?? 'en';
+                            final loc = AppLocalizations(lang);
+                            return Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.add, color: Colors.white),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    loc.addNewPet,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -243,50 +259,94 @@ class _PetsListPageState extends State<PetsListPage> {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+        child: FutureBuilder<String?>(
+          future: LanguageService().getLocalLanguage(),
+          builder: (context, snapshot) {
+            final lang = snapshot.data ?? 'en';
+            final loc = AppLocalizations(lang);
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Center(
-                child: Text('🐾', style: TextStyle(fontSize: 60)),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'No Pets Yet',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C3E50),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Add your first pet to start tracking their health and nutrition',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF7F8C8D),
-                height: 1.5,
-              ),
-            ),
-          ],
+                  child: const Center(
+                    child: Text('🐾', style: TextStyle(fontSize: 60)),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  loc.noPetsYetTitle,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  loc.addFirstPetDescription,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF7F8C8D),
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
+  }
+
+  String _getLocalizedAge(Pet pet, AppLocalizations loc) {
+    // Use the age_display from API if it's in the correct language (future enhancement)
+    // For now, format locally with localization
+    
+    if (pet.ageYears == null && pet.ageMonths == null && pet.ageWeeks == null) {
+      return '${loc.age} unknown';
+    }
+    
+    List<String> ageParts = [];
+    
+    if (pet.ageYears != null && pet.ageYears! > 0) {
+      if (pet.ageYears == 1) {
+        ageParts.add('${pet.ageYears} ${loc.year}');
+      } else {
+        ageParts.add('${pet.ageYears} ${loc.years}');
+      }
+    }
+    
+    if (pet.ageMonths != null && pet.ageMonths! > 0) {
+      if (pet.ageMonths == 1) {
+        ageParts.add('${pet.ageMonths} ${loc.month}');
+      } else {
+        ageParts.add('${pet.ageMonths} ${loc.months}');
+      }
+    }
+    
+    if (pet.ageWeeks != null && pet.ageWeeks! > 0 && (pet.ageYears == null || pet.ageYears! == 0) && (pet.ageMonths == null || pet.ageMonths! == 0)) {
+      if (pet.ageWeeks == 1) {
+        ageParts.add('${pet.ageWeeks} ${loc.week}');
+      } else {
+        ageParts.add('${pet.ageWeeks} ${loc.weeks}');
+      }
+    }
+    
+    return ageParts.isEmpty ? '${loc.age} unknown' : ageParts.join(' ');
   }
 
   Widget _buildPetCard(Pet pet) {
@@ -372,22 +432,31 @@ class _PetsListPageState extends State<PetsListPage> {
                                   : Colors.orange.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(pet.petIcon, style: const TextStyle(fontSize: 14)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  pet.displayPetType,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: pet.petType == 2 
-                                        ? Colors.purple
-                                        : Colors.orange,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                            child: FutureBuilder<String?>(
+                              future: LanguageService().getLocalLanguage(),
+                              builder: (context, snapshot) {
+                                final lang = snapshot.data ?? 'en';
+                                final loc = AppLocalizations(lang);
+                                // Determine pet type label based on petType id
+                                String petTypeLabel = pet.petType == 2 ? loc.cat : loc.dog;
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(pet.petIcon, style: const TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      petTypeLabel,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: pet.petType == 2 
+                                            ? Colors.purple
+                                            : Colors.orange,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -402,33 +471,40 @@ class _PetsListPageState extends State<PetsListPage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.cake, size: 14, color: Color(0xFF7F8C8D)),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              pet.displayAge.isNotEmpty ? pet.displayAge : 'Age unknown',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF7F8C8D),
+                      FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Row(
+                            children: [
+                              const Icon(Icons.cake, size: 14, color: Color(0xFF7F8C8D)),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  _getLocalizedAge(pet, loc),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF7F8C8D),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (pet.weight != null) ...[
-                            const Text(' • ', style: TextStyle(color: Color(0xFF7F8C8D), fontSize: 12)),
-                            const Icon(Icons.monitor_weight, size: 14, color: Color(0xFF7F8C8D)),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${pet.weight} kg',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF7F8C8D),
-                              ),
-                            ),
-                          ],
-                        ],
+                              if (pet.weight != null) ...[
+                                const Text(' • ', style: TextStyle(color: Color(0xFF7F8C8D), fontSize: 12)),
+                                const Icon(Icons.monitor_weight, size: 14, color: Color(0xFF7F8C8D)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${pet.weight} kg',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF7F8C8D),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -457,20 +533,27 @@ class _PetsListPageState extends State<PetsListPage> {
                         color: const Color(0xFFE8F5F3),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.restaurant, size: 16, color: Color(0xFF26B5A4)),
-                          SizedBox(width: 6),
-                          Text(
-                            'Nutrition Plan',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF26B5A4),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.restaurant, size: 16, color: Color(0xFF26B5A4)),
+                              const SizedBox(width: 6),
+                              Text(
+                                loc.nutritionPlanButton,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF26B5A4),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -487,20 +570,27 @@ class _PetsListPageState extends State<PetsListPage> {
                         color: Colors.pink.shade50,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.favorite, size: 16, color: Colors.pink.shade400),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Health Report',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.pink.shade400,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.favorite, size: 16, color: Colors.pink.shade400),
+                              const SizedBox(width: 6),
+                              Text(
+                                loc.healthReportButton,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.pink.shade400,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -522,20 +612,27 @@ class _PetsListPageState extends State<PetsListPage> {
                         color: Colors.amber.shade50,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.chat_bubble_outline, size: 16, color: Colors.amber.shade700),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Chat with AI',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.amber.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: FutureBuilder<String?>(
+                        future: LanguageService().getLocalLanguage(),
+                        builder: (context, snapshot) {
+                          final lang = snapshot.data ?? 'en';
+                          final loc = AppLocalizations(lang);
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.chat_bubble_outline, size: 16, color: Colors.amber.shade700),
+                              const SizedBox(width: 6),
+                              Text(
+                                loc.chatWithAI,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.amber.shade700,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -550,24 +647,31 @@ class _PetsListPageState extends State<PetsListPage> {
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Delete',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.red,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    child: FutureBuilder<String?>(
+                      future: LanguageService().getLocalLanguage(),
+                      builder: (context, snapshot) {
+                        final lang = snapshot.data ?? 'en';
+                        final loc = AppLocalizations(lang);
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              loc.delete,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),

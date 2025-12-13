@@ -3,6 +3,8 @@ import '../pages/home_page.dart';
 import '../pages/pets_list_page.dart';
 import '../pages/clinics_list_page.dart';
 import '../pages/profile_page.dart';
+import '../services/language_service.dart';
+import '../utils/app_localizations.dart';
 
 class BottomNavBar extends StatelessWidget {
   final String activePage;
@@ -28,40 +30,53 @@ class BottomNavBar extends StatelessWidget {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                context,
-                Icons.home,
-                'Home',
-                activePage == 'Home',
-              ),
-              _buildNavItem(
-                context,
-                Icons.pets,
-                'Pets',
-                activePage == 'Pets',
-              ),
-              _buildNavItem(
-                context,
-                Icons.location_on,
-                'Clinics',
-                activePage == 'Clinics',
-              ),
-              _buildNavItem(
-                context,
-                Icons.chat_bubble_outline,
-                'Chat',
-                activePage == 'Chat',
-              ),
-              _buildNavItem(
-                context,
-                Icons.person_outline,
-                'Profile',
-                activePage == 'Profile',
-              ),
-            ],
+          child: FutureBuilder<String?>(
+            future: LanguageService().getLocalLanguage(),
+            builder: (context, snapshot) {
+              String languageCode = snapshot.data ?? 'en';
+              AppLocalizations loc = AppLocalizations(languageCode);
+              
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(
+                    context,
+                    Icons.home,
+                    loc.home,
+                    'Home',
+                    activePage == 'Home',
+                  ),
+                  _buildNavItem(
+                    context,
+                    Icons.pets,
+                    loc.pets,
+                    'Pets',
+                    activePage == 'Pets',
+                  ),
+                  _buildNavItem(
+                    context,
+                    Icons.location_on,
+                    loc.clinics,
+                    'Clinics',
+                    activePage == 'Clinics',
+                  ),
+                  _buildNavItem(
+                    context,
+                    Icons.chat_bubble_outline,
+                    loc.chat,
+                    'Chat',
+                    activePage == 'Chat',
+                  ),
+                  _buildNavItem(
+                    context,
+                    Icons.person_outline,
+                    loc.profile,
+                    'Profile',
+                    activePage == 'Profile',
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -71,33 +86,34 @@ class BottomNavBar extends StatelessWidget {
   Widget _buildNavItem(
     BuildContext context,
     IconData icon,
-    String label,
+    String localizedLabel,
+    String pageKey,
     bool isActive,
   ) {
     return InkWell(
       onTap: () {
-        if (label == 'Home' && activePage != 'Home') {
+        if (pageKey == 'Home' && activePage != 'Home') {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const HomePage(),
             ),
           );
-        } else if (label == 'Pets' && activePage != 'Pets') {
+        } else if (pageKey == 'Pets' && activePage != 'Pets') {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const PetsListPage(),
             ),
           );
-        } else if (label == 'Clinics' && activePage != 'Clinics') {
+        } else if (pageKey == 'Clinics' && activePage != 'Clinics') {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const ClinicsListPage(),
             ),
           );
-        } else if (label == 'Profile' && activePage != 'Profile') {
+        } else if (pageKey == 'Profile' && activePage != 'Profile') {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -119,7 +135,7 @@ class BottomNavBar extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            label,
+            localizedLabel,
             style: TextStyle(
               fontSize: 11,
               color: isActive

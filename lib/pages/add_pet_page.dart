@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/pet_service.dart';
+import '../services/language_service.dart';
+import '../utils/app_localizations.dart';
 import '../models/pet_models.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -113,17 +115,22 @@ class _AddPetPageState extends State<AddPetPage> {
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Add Photo',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
-                    ),
-                  ),
+              child: FutureBuilder<String?>(
+                future: LanguageService().getLocalLanguage(),
+                builder: (context, snapshot) {
+                  String languageCode = snapshot.data ?? 'en';
+                  AppLocalizations loc = AppLocalizations(languageCode);
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        loc.addPhoto,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2C3E50),
+                        ),
+                      ),
                   const SizedBox(height: 20),
                   ListTile(
                     leading: Container(
@@ -137,9 +144,9 @@ class _AddPetPageState extends State<AddPetPage> {
                         color: Color(0xFF4ECDC4),
                       ),
                     ),
-                    title: const Text(
-                      'Take Photo',
-                      style: TextStyle(
+                    title: Text(
+                      loc.takePhoto,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -159,9 +166,9 @@ class _AddPetPageState extends State<AddPetPage> {
                         color: Color(0xFF4ECDC4),
                       ),
                     ),
-                    title: const Text(
-                      'Choose from Gallery',
-                      style: TextStyle(
+                    title: Text(
+                      loc.chooseFromGallery,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -169,7 +176,9 @@ class _AddPetPageState extends State<AddPetPage> {
                     onTap: () => Navigator.pop(context, ImageSource.gallery),
                   ),
                   const SizedBox(height: 10),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
           );
@@ -194,7 +203,14 @@ class _AddPetPageState extends State<AddPetPage> {
       print('Error picking image: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to pick image')),
+          SnackBar(content: FutureBuilder<String?>(
+            future: LanguageService().getLocalLanguage(),
+            builder: (context, snapshot) {
+              String languageCode = snapshot.data ?? 'en';
+              AppLocalizations loc = AppLocalizations(languageCode);
+              return Text(loc.failedToPickImage);
+            },
+          )),
         );
       }
     }
@@ -251,12 +267,26 @@ class _AddPetPageState extends State<AddPetPage> {
 
       if (pet != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pet added successfully!')),
+          SnackBar(content: FutureBuilder<String?>(
+            future: LanguageService().getLocalLanguage(),
+            builder: (context, snapshot) {
+              String languageCode = snapshot.data ?? 'en';
+              AppLocalizations loc = AppLocalizations(languageCode);
+              return Text(loc.petAddedSuccessfully);
+            },
+          )),
         );
         Navigator.pop(context, true); // Return true to refresh pet list
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to add pet. Please try again.')),
+          SnackBar(content: FutureBuilder<String?>(
+            future: LanguageService().getLocalLanguage(),
+            builder: (context, snapshot) {
+              String languageCode = snapshot.data ?? 'en';
+              AppLocalizations loc = AppLocalizations(languageCode);
+              return Text(loc.failedToAddPet);
+            },
+          )),
         );
       }
     } catch (e) {
@@ -273,49 +303,57 @@ class _AddPetPageState extends State<AddPetPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE8F5F3),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Add Pet',
-          style: TextStyle(
-            color: Color(0xFF2C3E50),
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+    return FutureBuilder<String?>(
+      future: LanguageService().getLocalLanguage(),
+      builder: (context, snapshot) {
+        String languageCode = snapshot.data ?? 'en';
+        AppLocalizations loc = AppLocalizations(languageCode);
+        
+        return Scaffold(
+          backgroundColor: const Color(0xFFE8F5F3),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              loc.addPetTitle,
+              style: const TextStyle(
+                color: Color(0xFF2C3E50),
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            ),
+            centerTitle: true,
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: _loadingOptions
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4ECDC4)))
-          : Column(
-              children: [
-                // Progress Indicator
-                _buildProgressIndicator(),
-                
-                // Form Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Form(
-                        key: _formKey,
-                        child: _buildCurrentStep(),
+          body: _loadingOptions
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4ECDC4)))
+              : Column(
+                  children: [
+                    // Progress Indicator
+                    _buildProgressIndicator(),
+                    
+                    // Form Content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Form(
+                            key: _formKey,
+                            child: _buildCurrentStep(loc),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    
+                    // Bottom Button
+                    _buildBottomButton(loc),
+                  ],
                 ),
-                
-                // Bottom Button
-                _buildBottomButton(),
-              ],
-            ),
+        );
+      },
     );
   }
 
@@ -348,20 +386,20 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildCurrentStep() {
+  Widget _buildCurrentStep(AppLocalizations loc) {
     switch (_currentStep) {
       case 0:
-        return _buildStep1();
+        return _buildStep1(loc);
       case 1:
-        return _buildStep2();
+        return _buildStep2(loc);
       case 2:
-        return _buildStep3();
+        return _buildStep3(loc);
       default:
-        return _buildStep1();
+        return _buildStep1(loc);
     }
   }
 
-  Widget _buildStep1() {
+  Widget _buildStep1(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -395,7 +433,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Add Photo',
+                              loc.addPhoto,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -429,9 +467,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 32),
 
         // Species
-        const Text(
-          'Species',
-          style: TextStyle(
+        Text(
+          loc.species,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -439,32 +477,28 @@ class _AddPetPageState extends State<AddPetPage> {
         ),
         const SizedBox(height: 12),
         Row(
-          children: [
-            Expanded(
-              child: _buildSpeciesCard(
-                icon: '🐕',
-                label: 'Dog',
-                isSelected: _formData.petType == 1,
-                onTap: () => _onPetTypeSelected(1),
+          children: _petTypes.take(2).map((petType) {
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: petType.id == _petTypes.first.id ? 12 : 0,
+                ),
+                child: _buildSpeciesCard(
+                  icon: petType.id == 1 ? '🐕' : '😺', // Dog or Cat icon
+                  label: petType.name, // This comes translated from server
+                  isSelected: _formData.petType == petType.id,
+                  onTap: () => _onPetTypeSelected(petType.id),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildSpeciesCard(
-                icon: '😺',
-                label: 'Cat',
-                isSelected: _formData.petType == 2,
-                onTap: () => _onPetTypeSelected(2),
-              ),
-            ),
-          ],
+            );
+          }).toList(),
         ),
         const SizedBox(height: 24),
 
         // Pet Name
-        const Text(
-          'Pet Name',
-          style: TextStyle(
+        Text(
+          loc.petName,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -474,7 +508,7 @@ class _AddPetPageState extends State<AddPetPage> {
         TextFormField(
           controller: _nameController,
           decoration: InputDecoration(
-            hintText: 'e.g., Luna',
+            hintText: loc.petNameHint,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: Colors.white,
@@ -489,7 +523,7 @@ class _AddPetPageState extends State<AddPetPage> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter pet name';
+              return loc.pleaseEnterPetName;
             }
             return null;
           },
@@ -497,9 +531,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 24),
 
         // Breed
-        const Text(
-          'Breed',
-          style: TextStyle(
+        Text(
+          loc.breed,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -510,7 +544,7 @@ class _AddPetPageState extends State<AddPetPage> {
           DropdownButtonFormField<int>(
             value: _formData.breed,
             decoration: InputDecoration(
-              hintText: 'e.g., Golden Retriever',
+              hintText: loc.selectBreed,
               hintStyle: TextStyle(color: Colors.grey[400]),
               filled: true,
               fillColor: Colors.white,
@@ -537,7 +571,7 @@ class _AddPetPageState extends State<AddPetPage> {
           TextFormField(
             controller: _breedController,
             decoration: InputDecoration(
-              hintText: 'e.g., Golden Retriever',
+              hintText: loc.selectBreed,
               hintStyle: TextStyle(color: Colors.grey[400]),
               filled: true,
               fillColor: Colors.white,
@@ -562,9 +596,9 @@ class _AddPetPageState extends State<AddPetPage> {
               }
             });
           },
-          title: const Text(
-            'Unknown/Mixed Breed',
-            style: TextStyle(fontSize: 14),
+          title: Text(
+            loc.unknownBreed,
+            style: const TextStyle(fontSize: 14),
           ),
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.zero,
@@ -574,15 +608,15 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildStep2() {
+  Widget _buildStep2(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Age Category
         if (_ageCategories.isNotEmpty) ...[
-          const Text(
-            'Age Category',
-            style: TextStyle(
+          Text(
+            loc.ageCategory,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -605,9 +639,9 @@ class _AddPetPageState extends State<AddPetPage> {
         ],
 
         // Age - Conditional based on age category
-        const Text(
-          'Age',
-          style: TextStyle(
+        Text(
+          loc.age,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -625,12 +659,12 @@ class _AddPetPageState extends State<AddPetPage> {
                       ? int.tryParse(_ageMonthsController.text) 
                       : null,
                   decoration: InputDecoration(
-                    labelText: _ageMonthsController.text.isNotEmpty ? 'Months' : null,
+                    labelText: _ageMonthsController.text.isNotEmpty ? loc.ageInMonths : null,
                     labelStyle: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFF4ECDC4),
                     ),
-                    hintText: 'Months',
+                    hintText: loc.ageInMonths,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                     filled: true,
                     fillColor: Colors.white,
@@ -663,12 +697,12 @@ class _AddPetPageState extends State<AddPetPage> {
                       ? int.tryParse(_ageWeeksController.text) 
                       : null,
                   decoration: InputDecoration(
-                    labelText: _ageWeeksController.text.isNotEmpty ? 'Weeks' : null,
+                    labelText: _ageWeeksController.text.isNotEmpty ? loc.ageInWeeks : null,
                     labelStyle: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFF4ECDC4),
                     ),
-                    hintText: 'Weeks',
+                    hintText: loc.ageInWeeks,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                     filled: true,
                     fillColor: Colors.white,
@@ -706,12 +740,12 @@ class _AddPetPageState extends State<AddPetPage> {
                       ? int.tryParse(_ageYearsController.text) 
                       : null,
                   decoration: InputDecoration(
-                    labelText: _ageYearsController.text.isNotEmpty ? 'Years' : null,
+                    labelText: _ageYearsController.text.isNotEmpty ? loc.ageInYears : null,
                     labelStyle: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFF4ECDC4),
                     ),
-                    hintText: 'Years',
+                    hintText: loc.ageInYears,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                     filled: true,
                     fillColor: Colors.white,
@@ -744,12 +778,12 @@ class _AddPetPageState extends State<AddPetPage> {
                       ? int.tryParse(_ageMonthsController.text) 
                       : null,
                   decoration: InputDecoration(
-                    labelText: _ageMonthsController.text.isNotEmpty ? 'Months' : null,
+                    labelText: _ageMonthsController.text.isNotEmpty ? loc.ageInMonths : null,
                     labelStyle: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFF4ECDC4),
                     ),
-                    hintText: 'Months',
+                    hintText: loc.ageInMonths,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                     filled: true,
                     fillColor: Colors.white,
@@ -780,9 +814,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 24),
 
         // Weight
-        const Text(
-          'Weight (kg)',
-          style: TextStyle(
+        Text(
+          loc.weightKg,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -810,9 +844,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 24),
 
         // Gender
-        const Text(
-          'Gender',
-          style: TextStyle(
+        Text(
+          loc.gender,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -842,9 +876,9 @@ class _AddPetPageState extends State<AddPetPage> {
           onChanged: (value) {
             setState(() => _formData.neutered = value ?? false);
           },
-          title: const Text(
-            'Neutered/Spayed',
-            style: TextStyle(fontSize: 14),
+          title: Text(
+            loc.neuteredSpayed,
+            style: const TextStyle(fontSize: 14),
           ),
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.zero,
@@ -853,9 +887,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 24),
 
         // Activity Level
-        const Text(
-          'Activity Level',
-          style: TextStyle(
+        Text(
+          loc.activityLevel,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -879,14 +913,14 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildStep3() {
+  Widget _buildStep3(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Body Type
-        const Text(
-          'Body Type',
-          style: TextStyle(
+        Text(
+          loc.bodyType,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -908,9 +942,9 @@ class _AddPetPageState extends State<AddPetPage> {
         const SizedBox(height: 24),
 
         // Current Diet (Food Types)
-        const Text(
-          'Current Diet',
-          style: TextStyle(
+        Text(
+          loc.currentDiet,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -941,9 +975,9 @@ class _AddPetPageState extends State<AddPetPage> {
 
         // Food Preference - How they feel about food
         if (_foodFeelings.isNotEmpty) ...[
-          const Text(
-            'Food Preference',
-            style: TextStyle(
+          Text(
+            loc.foodPreference,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -967,9 +1001,9 @@ class _AddPetPageState extends State<AddPetPage> {
 
         // What's important about their food
         if (_foodImportance.isNotEmpty) ...[
-          const Text(
-            'Food Importance',
-            style: TextStyle(
+          Text(
+            loc.foodImportance,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -993,9 +1027,9 @@ class _AddPetPageState extends State<AddPetPage> {
 
         // Treats (Treat Frequency)
         if (_treatFrequencies.isNotEmpty) ...[
-          const Text(
-            'Treats',
-            style: TextStyle(
+          Text(
+            loc.treats,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1019,9 +1053,9 @@ class _AddPetPageState extends State<AddPetPage> {
 
         // Food Allergies
         if (_foodAllergies.isNotEmpty) ...[
-          const Text(
-            'Food Allergies',
-            style: TextStyle(
+          Text(
+            loc.foodAllergies,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1053,9 +1087,9 @@ class _AddPetPageState extends State<AddPetPage> {
 
         // Health Issues
         if (_healthIssues.isNotEmpty) ...[
-          const Text(
-            'Health Issues',
-            style: TextStyle(
+          Text(
+            loc.healthIssues,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1086,9 +1120,9 @@ class _AddPetPageState extends State<AddPetPage> {
         ],
 
         // Notes
-        const Text(
-          'Notes',
-          style: TextStyle(
+        Text(
+          loc.notes,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -1099,7 +1133,7 @@ class _AddPetPageState extends State<AddPetPage> {
           controller: _notesController,
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: 'Any additional notes about your pet...',
+            hintText: loc.enterNotes,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: Colors.white,
@@ -1114,7 +1148,7 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildBottomButton() {
+  Widget _buildBottomButton(AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1150,7 +1184,7 @@ class _AddPetPageState extends State<AddPetPage> {
                     ),
                   )
                 : Text(
-                    _currentStep == 2 ? 'Save' : 'Next',
+                    _currentStep == 2 ? loc.save : loc.next,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

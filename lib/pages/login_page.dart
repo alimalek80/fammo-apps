@@ -3,10 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
 import '../services/config_service.dart';
+import '../services/biometric_service.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'registration_type_page.dart';
 import 'home_page.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   final String? prefilledEmail;
@@ -22,16 +24,20 @@ class _LoginPageState extends State<LoginPage> {
   final passwordCtrl = TextEditingController();
   final auth = AuthService();
   final languageService = LanguageService();
+  final biometricService = BiometricService();
 
   String message = "";
   bool isLoading = false;
   bool _obscurePassword = true;
+  bool _biometricAvailable = false;
+  bool _biometricEnabled = false;
   AppLocalizations? _localizations;
 
   @override
   void initState() {
     super.initState();
     _loadLocalizations();
+    _checkBiometricAvailability();
     // Pre-fill email if provided
     if (widget.prefilledEmail != null) {
       emailCtrl.text = widget.prefilledEmail!;
@@ -43,6 +49,22 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _localizations = AppLocalizations(langCode);
     });
+  }
+
+  Future<void> _checkBiometricAvailability() async {
+    try {
+      final available = await biometricService.canCheckDeviceCredential();
+      final enabled = await biometricService.isBiometricLoginEnabled();
+      print('DEBUG: Biometric Available: $available, Enabled: $enabled');
+      if (mounted) {
+        setState(() {
+          _biometricAvailable = available;
+          _biometricEnabled = enabled;
+        });
+      }
+    } catch (e) {
+      print('DEBUG: Error checking biometric: $e');
+    }
   }
 
   Future<void> handleLogin() async {
@@ -58,12 +80,23 @@ class _LoginPageState extends State<LoginPage> {
       final ok = await auth.login(emailCtrl.text, passwordCtrl.text);
       
       if (ok) {
+        // Save credentials to system credential manager
+        await auth.saveCredentialsToSystem(emailCtrl.text, passwordCtrl.text);
+        
         // Sync language preference to backend after successful login
         final accessToken = await auth.getAccessToken();
         final localLanguage = await languageService.getLocalLanguage();
         
         if (accessToken != null && localLanguage != null) {
           await languageService.setUserLanguage(accessToken, localLanguage);
+        }
+        
+        // Offer to enable biometric login if available and not already enabled
+        if (_biometricAvailable && !_biometricEnabled && accessToken != null) {
+          // Show dialog and wait for it to complete
+          if (mounted) {
+            await _showBiometricSetupDialogAsync(emailCtrl.text, accessToken);
+          }
         }
         
         setState(() {
@@ -90,6 +123,127 @@ class _LoginPageState extends State<LoginPage> {
         message = "${localizations.error}: $e";
       });
     }
+  }
+
+  Future<void> _handleBiometricLogin() async {
+    final localizations = _localizations ?? AppLocalizations('en');
+    
+    try {
+      setState(() {
+        isLoading = true;
+        message = localizations.authenticateWithBiometric;
+      });
+
+      // Authenticate with biometric
+      final authenticated = await biometricService.authenticateWithDeviceCredentials(
+        reason: localizations.authenticateWithBiometric,
+      );
+
+      if (authenticated) {
+        // Get saved token and email
+        final savedToken = await biometricService.getBiometricToken();
+        final savedEmail = await biometricService.getBiometricEmail();
+        
+        if (savedToken != null && savedEmail != null) {
+          // Store the token in auth service for session
+          await auth.storage.write(key: "access", value: savedToken);
+          
+          setState(() {
+            message = localizations.biometricSuccess;
+            isLoading = false;
+          });
+          
+          // Navigate to home page
+          if (mounted) {
+            await Future.delayed(const Duration(milliseconds: 500));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
+        } else {
+          setState(() {
+            message = localizations.biometricFailed;
+            isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          message = localizations.biometricFailed;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        message = "${localizations.error}: $e";
+      });
+    }
+  }
+
+  void _showBiometricSetupDialog(String email, String token) {
+    final localizations = _localizations ?? AppLocalizations('en');
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.biometricAvailable),
+        content: Text(localizations.enableBiometric),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Later'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await biometricService.enableBiometricLogin(email, token);
+              setState(() {
+                _biometricEnabled = true;
+              });
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Enable'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showBiometricSetupDialogAsync(String email, String token) async {
+    final localizations = _localizations ?? AppLocalizations('en');
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.biometricAvailable),
+        content: Text(localizations.enableBiometric),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (mounted) {
+                Navigator.pop(context, false);
+              }
+            },
+            child: const Text('Later'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await biometricService.enableBiometricLogin(email, token);
+              setState(() {
+                _biometricEnabled = true;
+              });
+              if (mounted) {
+                Navigator.pop(context, true);
+              }
+            },
+            child: const Text('Enable'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -252,7 +406,12 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // TODO: Implement forgot password
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage(),
+                        ),
+                      );
                     },
                     child: Text(
                       _localizations?.forgotPassword ?? 'Forgot Password?',
@@ -307,6 +466,34 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 14,
                         color: message.contains('🎉') ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ),
+                
+                const SizedBox(height: 16),
+                
+                // Biometric login button
+                if (_biometricAvailable)
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading ? null : _handleBiometricLogin,
+                      icon: const Icon(Icons.fingerprint, size: 24),
+                      label: Text(
+                        _localizations?.biometricLogin ?? 'Biometric Login',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF26B5A4),
+                        side: const BorderSide(color: Color(0xFF26B5A4), width: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),

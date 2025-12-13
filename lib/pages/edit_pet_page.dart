@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/pet_service.dart';
 import '../models/pet_models.dart';
+import '../services/language_service.dart';
+import '../utils/app_localizations.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -187,9 +189,9 @@ class _EditPetPageState extends State<EditPetPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Change Photo',
-                    style: TextStyle(
+                  Text(
+                    'Change Photo', // TODO: Add to localization
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF2C3E50),
@@ -209,7 +211,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       ),
                     ),
                     title: const Text(
-                      'Take Photo',
+                      'Take Photo', // TODO: Add to localization
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -231,7 +233,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       ),
                     ),
                     title: const Text(
-                      'Choose from Gallery',
+                      'Choose from Gallery', // TODO: Add to localization
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -265,7 +267,7 @@ class _EditPetPageState extends State<EditPetPage> {
       print('Error picking image: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to pick image')),
+          const SnackBar(content: Text('Failed to pick image')), // TODO: Add to localization
         );
       }
     }
@@ -289,6 +291,10 @@ class _EditPetPageState extends State<EditPetPage> {
     setState(() => _isLoading = true);
 
     try {
+      // Get localization instance
+      String languageCode = await LanguageService().getLocalLanguage() ?? 'en';
+      AppLocalizations loc = AppLocalizations(languageCode);
+      
       _formData.name = _nameController.text;
       if (_weightController.text.isNotEmpty) {
         _formData.weight = double.tryParse(_weightController.text);
@@ -309,12 +315,12 @@ class _EditPetPageState extends State<EditPetPage> {
 
       if (pet != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pet updated successfully!')),
+          SnackBar(content: Text(loc.petUpdatedSuccessfully)),
         );
         Navigator.pop(context, true); // Return true to refresh pet list
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update pet. Please try again.')),
+          const SnackBar(content: Text('Failed to update pet. Please try again.')), // TODO: Add to localization
         );
       }
     } catch (e) {
@@ -331,49 +337,57 @@ class _EditPetPageState extends State<EditPetPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE8F5F3),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Edit Pet',
-          style: TextStyle(
-            color: Color(0xFF2C3E50),
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+    return FutureBuilder<String?>(
+      future: LanguageService().getLocalLanguage(),
+      builder: (context, snapshot) {
+        String languageCode = snapshot.data ?? 'en';
+        AppLocalizations loc = AppLocalizations(languageCode);
+        
+        return Scaffold(
+          backgroundColor: const Color(0xFFE8F5F3),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              loc.editPet,
+              style: const TextStyle(
+                color: Color(0xFF2C3E50),
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            ),
+            centerTitle: true,
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: _loadingOptions
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4ECDC4)))
-          : Column(
-              children: [
-                // Progress Indicator
-                _buildProgressIndicator(),
-                
-                // Form Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Form(
-                        key: _formKey,
-                        child: _buildCurrentStep(),
+          body: _loadingOptions
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4ECDC4)))
+              : Column(
+                  children: [
+                    // Progress Indicator
+                    _buildProgressIndicator(),
+                    
+                    // Form Content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Form(
+                            key: _formKey,
+                            child: _buildCurrentStep(loc),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    
+                    // Bottom Button
+                    _buildBottomButton(loc),
+                  ],
                 ),
-                
-                // Bottom Button
-                _buildBottomButton(),
-              ],
-            ),
+        );
+      },
     );
   }
 
@@ -406,20 +420,20 @@ class _EditPetPageState extends State<EditPetPage> {
     );
   }
 
-  Widget _buildCurrentStep() {
+  Widget _buildCurrentStep(AppLocalizations loc) {
     switch (_currentStep) {
       case 0:
-        return _buildStep1();
+        return _buildStep1(loc);
       case 1:
-        return _buildStep2();
+        return _buildStep2(loc);
       case 2:
-        return _buildStep3();
+        return _buildStep3(loc);
       default:
-        return _buildStep1();
+        return _buildStep1(loc);
     }
   }
 
-  Widget _buildStep1() {
+  Widget _buildStep1(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -458,7 +472,7 @@ class _EditPetPageState extends State<EditPetPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Add Photo',
+                              loc.addPhoto,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -493,9 +507,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 32),
 
         // Species
-        const Text(
-          'Species',
-          style: TextStyle(
+        Text(
+          loc.species,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -507,7 +521,7 @@ class _EditPetPageState extends State<EditPetPage> {
             Expanded(
               child: _buildSpeciesCard(
                 icon: '🐕',
-                label: 'Dog',
+                label: loc.dog,
                 isSelected: _formData.petType == 1,
                 onTap: () => _onPetTypeSelected(1),
               ),
@@ -516,7 +530,7 @@ class _EditPetPageState extends State<EditPetPage> {
             Expanded(
               child: _buildSpeciesCard(
                 icon: '😺',
-                label: 'Cat',
+                label: loc.cat,
                 isSelected: _formData.petType == 2,
                 onTap: () => _onPetTypeSelected(2),
               ),
@@ -526,9 +540,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Pet Name
-        const Text(
-          'Pet Name',
-          style: TextStyle(
+        Text(
+          loc.petName,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -538,7 +552,7 @@ class _EditPetPageState extends State<EditPetPage> {
         TextFormField(
           controller: _nameController,
           decoration: InputDecoration(
-            hintText: 'e.g., Luna',
+            hintText: loc.petNameHint,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: Colors.white,
@@ -553,7 +567,7 @@ class _EditPetPageState extends State<EditPetPage> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter pet name';
+              return loc.pleaseEnterPetName;
             }
             return null;
           },
@@ -561,9 +575,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Breed
-        const Text(
-          'Breed',
-          style: TextStyle(
+        Text(
+          loc.breed,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -638,15 +652,15 @@ class _EditPetPageState extends State<EditPetPage> {
     );
   }
 
-  Widget _buildStep2() {
+  Widget _buildStep2(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Age Category
         if (_ageCategories.isNotEmpty) ...[
-          const Text(
-            'Age Category',
-            style: TextStyle(
+          Text(
+            loc.ageCategory,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -669,9 +683,9 @@ class _EditPetPageState extends State<EditPetPage> {
         ],
 
         // Age - Conditional based on age category
-        const Text(
-          'Age',
-          style: TextStyle(
+        Text(
+          loc.age,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -844,9 +858,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Weight
-        const Text(
-          'Weight (kg)',
-          style: TextStyle(
+        Text(
+          loc.weightKg,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -874,9 +888,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Gender
-        const Text(
-          'Gender',
-          style: TextStyle(
+        Text(
+          loc.gender,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -906,9 +920,9 @@ class _EditPetPageState extends State<EditPetPage> {
           onChanged: (value) {
             setState(() => _formData.neutered = value ?? false);
           },
-          title: const Text(
-            'Neutered/Spayed',
-            style: TextStyle(fontSize: 14),
+          title: Text(
+            loc.neuteredSpayed,
+            style: const TextStyle(fontSize: 14),
           ),
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: EdgeInsets.zero,
@@ -917,9 +931,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Activity Level
-        const Text(
-          'Activity Level',
-          style: TextStyle(
+        Text(
+          loc.activityLevel,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -943,14 +957,14 @@ class _EditPetPageState extends State<EditPetPage> {
     );
   }
 
-  Widget _buildStep3() {
+  Widget _buildStep3(AppLocalizations loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Body Type
-        const Text(
-          'Body Type',
-          style: TextStyle(
+        Text(
+          loc.bodyType,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -972,9 +986,9 @@ class _EditPetPageState extends State<EditPetPage> {
         const SizedBox(height: 24),
 
         // Current Diet (Food Types)
-        const Text(
-          'Current Diet',
-          style: TextStyle(
+        Text(
+          loc.currentDiet,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -1005,9 +1019,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
         // Food Preference - How they feel about food
         if (_foodFeelings.isNotEmpty) ...[
-          const Text(
-            'Food Preference',
-            style: TextStyle(
+          Text(
+            loc.foodPreference,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1031,9 +1045,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
         // What's important about their food
         if (_foodImportance.isNotEmpty) ...[
-          const Text(
-            'Food Importance',
-            style: TextStyle(
+          Text(
+            loc.foodImportance,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1057,9 +1071,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
         // Treats (Treat Frequency)
         if (_treatFrequencies.isNotEmpty) ...[
-          const Text(
-            'Treats',
-            style: TextStyle(
+          Text(
+            loc.treats,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1083,9 +1097,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
         // Food Allergies
         if (_foodAllergies.isNotEmpty) ...[
-          const Text(
-            'Food Allergies',
-            style: TextStyle(
+          Text(
+            loc.foodAllergies,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1117,9 +1131,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
         // Health Issues
         if (_healthIssues.isNotEmpty) ...[
-          const Text(
-            'Health Issues',
-            style: TextStyle(
+          Text(
+            loc.healthIssues,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF2C3E50),
@@ -1150,9 +1164,9 @@ class _EditPetPageState extends State<EditPetPage> {
         ],
 
         // Notes
-        const Text(
-          'Notes',
-          style: TextStyle(
+        Text(
+          loc.notes,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF2C3E50),
@@ -1163,7 +1177,7 @@ class _EditPetPageState extends State<EditPetPage> {
           controller: _notesController,
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: 'Any additional notes about your pet...',
+            hintText: loc.enterNotes,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: Colors.white,
@@ -1178,7 +1192,7 @@ class _EditPetPageState extends State<EditPetPage> {
     );
   }
 
-  Widget _buildBottomButton() {
+  Widget _buildBottomButton(AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1214,7 +1228,7 @@ class _EditPetPageState extends State<EditPetPage> {
                     ),
                   )
                 : Text(
-                    _currentStep == 2 ? 'Save' : 'Next',
+                    _currentStep == 2 ? loc.save : loc.next,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -1373,7 +1387,7 @@ class _EditPetPageState extends State<EditPetPage> {
         if (!_formKey.currentState!.validate()) return;
         if (_formData.petType == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please select a species')),
+            const SnackBar(content: Text('Please select a species')), // TODO: Add to localization
           );
           return;
         }

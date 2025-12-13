@@ -4,6 +4,7 @@ import 'pages/login_page.dart';
 import 'pages/clinics_list_page.dart';
 import 'pages/my_clinic_page.dart';
 import 'pages/add_edit_clinic_page.dart';
+import 'pages/reset_password_page.dart';
 import 'services/language_service.dart';
 import 'services/config_service.dart';
 import 'services/deep_link_service.dart';
@@ -38,7 +39,9 @@ class _MyAppState extends State<MyApp> {
   void _initializeDeepLinks() {
     _deepLinkService.initialize((Uri uri) {
       print('Deep link received: $uri');
+      print('Scheme: ${uri.scheme}, Host: ${uri.host}');
       print('Path: ${uri.path}');
+      print('Path segments: ${uri.pathSegments}');
       
       // Handle user account activation: fammo://login?activated=true&email=...
       if (uri.scheme == 'fammo' && uri.host == 'login') {
@@ -55,11 +58,41 @@ class _MyAppState extends State<MyApp> {
         }
       }
       
-      // Handle clinic email confirmation with two possible paths:
-      // 1. https://fammo.ai/vets/confirm-email/{clinic_id}/{token}/ (current API response)
-      // 2. https://fammo.ai/en/clinics/confirm-email/{clinic_id}/{token}/ (future format)
-      else if (uri.scheme == 'https' && uri.host == 'fammo.ai') {
-        final pathSegments = uri.pathSegments;
+      // Handle password reset and clinic email confirmation
+      if (uri.scheme == 'https' && uri.host == 'fammo.ai') {
+        final pathSegments = uri.pathSegments
+            .where((segment) => segment.isNotEmpty)
+            .toList();
+        
+        print('Filtered path segments: $pathSegments');
+        
+        // Check for /reset-password/{uid}/{token} pattern
+        if (pathSegments.isNotEmpty && pathSegments[0] == 'reset-password') {
+          if (pathSegments.length >= 3) {
+            final uid = pathSegments[1];
+            final token = pathSegments[2];
+            
+            print('✓ Password reset link detected - UID: $uid, Token: $token');
+            
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (navigatorKey.currentContext != null) {
+                Navigator.of(navigatorKey.currentContext!).push(
+                  MaterialPageRoute(
+                    builder: (context) => ResetPasswordPage(
+                      uid: uid,
+                      token: token,
+                    ),
+                  ),
+                );
+              }
+            });
+            return;
+          }
+        }
+        
+        // Handle clinic email confirmation with two possible paths:
+        // 1. https://fammo.ai/vets/confirm-email/{clinic_id}/{token}/ (current API response)
+        // 2. https://fammo.ai/en/clinics/confirm-email/{clinic_id}/{token}/ (future format)
         
         // Check for /vets/confirm-email/ pattern
         if (pathSegments.contains('confirm-email') && pathSegments.contains('vets')) {

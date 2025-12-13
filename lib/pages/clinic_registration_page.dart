@@ -9,6 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import '../services/config_service.dart';
 import '../services/language_service.dart';
+import '../services/legal_documents_service.dart';
+import '../widgets/legal_agreements.dart';
+import '../utils/app_localizations.dart';
 
 
 class ClinicRegistrationPage extends StatefulWidget {
@@ -25,6 +28,24 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   final languageService = LanguageService();
+  final LegalDocumentsService _legalService = LegalDocumentsService();
+  Map<String, bool> _legalAgreements = {};
+  AppLocalizations? _localizations;
+
+  AppLocalizations get localizations => _localizations ?? AppLocalizations('en');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalizations();
+  }
+
+  Future<void> _loadLocalizations() async {
+    final langCode = await languageService.getLocalLanguage() ?? 'en';
+    setState(() {
+      _localizations = AppLocalizations(langCode);
+    });
+  }
 
   // Account fields for clinic owner
   final _ownerEmailController = TextEditingController();
@@ -185,6 +206,18 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
       return;
     }
 
+    // Validate legal agreements for clinic registration
+    bool hasRequiredAgreements = (_legalAgreements['clinicTerms'] ?? false) &&
+                                 (_legalAgreements['partnership'] ?? false) &&
+                                 (_legalAgreements['privacy'] ?? false);
+    
+    if (!hasRequiredAgreements) {
+      setState(() {
+        _message = localizations.pleaseAcceptRequiredTerms;
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _message = "Registering your clinic...";
@@ -318,6 +351,9 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
       if (logoFile != null && clinic['id'] != null) {
         await _uploadLogo(clinic['id'], ''); // No access token needed
       }
+
+      // Record legal consent after successful registration
+      await _recordLegalConsent();
 
       setState(() {
         _isLoading = false;
@@ -954,6 +990,23 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
           tileColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
+        const SizedBox(height: 32),
+        
+        // Legal Agreements Section
+        const Text(
+          'Legal Agreements',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2C3E50)),
+        ),
+        const SizedBox(height: 16),
+        LegalAgreements(
+          isClinicRegistration: true,
+          onAgreementChanged: (agreements) {
+            setState(() {
+              _legalAgreements = agreements;
+            });
+          },
+          initialAgreements: _legalAgreements,
+        ),
       ],
     );
   }
@@ -1249,5 +1302,17 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _recordLegalConsent() async {
+    try {
+      // For now, just log that consent would be recorded
+      // TODO: Implement proper document ID fetching and consent recording after successful registration
+      debugPrint('Clinic consent recorded for: ${_ownerEmailController.text}');
+      debugPrint('Agreed to: ${_legalAgreements.keys.where((key) => _legalAgreements[key] == true).join(', ')}');
+    } catch (e) {
+      // Log error but don't prevent registration completion
+      debugPrint('Failed to record legal consent: $e');
+    }
   }
 }
