@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMMO - AI-Powered Pet Health & Nutrition Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#26B5A4',
+                        'primary-dark': '#1a8a7d',
+                        secondary: '#FF9800',
+                        dark: '#2C3E50',
+                        light: '#E0F7F4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .no-print {
+                display: none !important;
+            }
+            a {
+                color: #26B5A4;
+                text-decoration: none;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .screenshot-container {
+                break-inside: avoid;
+            }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #26B5A4 0%, #1a8a7d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .screenshot-container img {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .screenshot-container:hover img {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(38, 181, 164, 0.3);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-primary to-primary-dark text-white shadow-2xl">
+        <div class="max-w-7xl mx-auto px-6 py-16 text-center">
+            <div class="flex justify-center mb-6">
+                <div class="w-32 h-32 bg-white rounded-3xl shadow-2xl p-3 transform hover:scale-105 transition-transform duration-300">
+                    <img src="assets/icon/app_icon.png" alt="FAMMO App Icon" class="w-full h-full object-contain">
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-bold mb-3">🐾 FAMMO</h1>
+            <p class="text-xl md:text-2xl font-light opacity-95 mb-6">AI-Powered Pet Health & Nutrition Management</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-medium">Version 1.0.0</span>
+                <span class="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-medium">Health & Fitness</span>
+                <span class="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-medium">Android & iOS</span>
+                <span class="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-medium">4 Languages</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        
+        <!-- About Section -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">✨ About FAMMO</h2>
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <p class="text-lg leading-relaxed mb-6">
+                    <strong>FAMMO</strong> is a comprehensive mobile application that leverages artificial intelligence to help pet owners manage their pets' health, nutrition, and wellness while connecting them with veterinary clinics.
+                </p>
+                <div class="bg-light border-l-4 border-primary rounded-lg p-6">
+                    <p class="text-lg font-semibold text-dark mb-2">🎯 Mission</p>
+                    <p class="text-gray-700">To empower pet owners with AI-powered tools and connect them with trusted veterinary care, making pet wellness accessible to everyone.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screenshots Gallery - Login & Auth -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">📱 App Screenshots</h2>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-dark mb-6">Authentication & Onboarding</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114041.jpg" alt="Login Screen" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Login Screen</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114104.jpg" alt="Sign Up" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Sign Up</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114127.jpg" alt="Language Selection" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Language Selection</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet Management Screenshots -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-dark mb-6">Pet Management</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114144.jpg" alt="Home Screen" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Home Dashboard</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114213.jpg" alt="Pet Profile" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Pet Profile Details</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114235.jpg" alt="Add Pet" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">Add New Pet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Features Screenshots -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h3 class="text-2xl font-bold text-dark mb-6">AI-Powered Features</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114247.jpg" alt="Nutrition Plan" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">AI Nutrition Plan</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114309.jpg" alt="Health Report" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">AI Health Report</p>
+                    </div>
+                    <div class="screenshot-container">
+                        <img src="screenshots/Screenshot_20251217_114320.jpg" alt="Profile Settings" class="w-full h-auto rounded-xl shadow-lg">
+                        <p class="text-center mt-3 text-gray-600 font-medium">User Profile & Settings</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">🚀 Key Features</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Pet Management -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-primary">
+                    <div class="text-4xl mb-4">🐕</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">Pet Management</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-primary mr-2">✓</span> Multi-pet support (dogs, cats)</li>
+                        <li class="flex items-start"><span class="text-primary mr-2">✓</span> Detailed pet profiles</li>
+                        <li class="flex items-start"><span class="text-primary mr-2">✓</span> Health tracking</li>
+                        <li class="flex items-start"><span class="text-primary mr-2">✓</span> Photo galleries</li>
+                        <li class="flex items-start"><span class="text-primary mr-2">✓</span> Medical history</li>
+                    </ul>
+                </div>
+
+                <!-- AI Nutrition -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-secondary">
+                    <div class="text-4xl mb-4">🍽️</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">AI Nutrition Planning</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-secondary mr-2">✓</span> Personalized meal plans</li>
+                        <li class="flex items-start"><span class="text-secondary mr-2">✓</span> Feeding schedules</li>
+                        <li class="flex items-start"><span class="text-secondary mr-2">✓</span> Nutritional analysis</li>
+                        <li class="flex items-start"><span class="text-secondary mr-2">✓</span> Allergy considerations</li>
+                        <li class="flex items-start"><span class="text-secondary mr-2">✓</span> Safety recommendations</li>
+                    </ul>
+                </div>
+
+                <!-- Health Monitoring -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div class="text-4xl mb-4">🏥</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">Health Monitoring</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> AI health reports</li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Health summaries</li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Personalized recommendations</li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Condition tracking</li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Health history</li>
+                    </ul>
+                </div>
+
+                <!-- Clinic Network -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div class="text-4xl mb-4">🏥</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">Veterinary Clinic Network</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span> Find nearby clinics</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span> Search & filter</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span> View clinic details</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span> Working hours</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span> Direct contact</li>
+                    </ul>
+                </div>
+
+                <!-- For Clinics -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                    <div class="text-4xl mb-4">🏪</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">For Veterinary Clinics</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-purple-500 mr-2">✓</span> Easy registration</li>
+                        <li class="flex items-start"><span class="text-purple-500 mr-2">✓</span> Profile management</li>
+                        <li class="flex items-start"><span class="text-purple-500 mr-2">✓</span> Schedule management</li>
+                        <li class="flex items-start"><span class="text-purple-500 mr-2">✓</span> Credential showcase</li>
+                        <li class="flex items-start"><span class="text-purple-500 mr-2">✓</span> Referral tracking</li>
+                    </ul>
+                </div>
+
+                <!-- Security -->
+                <div class="feature-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h4 class="text-xl font-bold text-dark mb-3">Security & Privacy</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✓</span> Biometric authentication</li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✓</span> Encrypted data</li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✓</span> HTTPS transmission</li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✓</span> Privacy controls</li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✓</span> Account deletion</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Experience -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">📱 User Experience</h2>
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">🌍</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Multi-Language Support</h4>
+                            <p class="text-gray-600">Available in English, Turkish, Finnish, Dutch</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">🔒</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Biometric Login</h4>
+                            <p class="text-gray-600">Fingerprint & Face ID support</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">🎨</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Modern Design</h4>
+                            <p class="text-gray-600">Beautiful, intuitive interface</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">💾</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Offline Access</h4>
+                            <p class="text-gray-600">View saved data without internet</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">🔔</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Push Notifications</h4>
+                            <p class="text-gray-600">Stay updated on important information</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-4xl">⚡</span>
+                        <div>
+                            <h4 class="font-bold text-lg text-dark">Fast & Responsive</h4>
+                            <p class="text-gray-600">Smooth performance on all devices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- How It Works -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">🎯 How It Works</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- For Pet Owners -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-primary mb-6">For Pet Owners</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">1</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Sign Up & Login</h4>
+                                <p class="text-gray-600 text-sm">Create account with email and password, optional biometric authentication</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">2</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Add Your Pets</h4>
+                                <p class="text-gray-600 text-sm">Input information, add photos, specify health conditions and preferences</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">3</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Get AI Recommendations</h4>
+                                <p class="text-gray-600 text-sm">Generate personalized nutrition plans and health reports</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">4</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Find Veterinary Care</h4>
+                                <p class="text-gray-600 text-sm">Browse nearby clinics and contact them directly</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">5</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Manage & Track</h4>
+                                <p class="text-gray-600 text-sm">Monitor health and nutrition over time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- For Veterinary Clinics -->
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-secondary mb-6">For Veterinary Clinics</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center font-bold">1</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Register Your Clinic</h4>
+                                <p class="text-gray-600 text-sm">Provide basic information, contact details, and location</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center font-bold">2</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Complete Profile</h4>
+                                <p class="text-gray-600 text-sm">Add veterinarian credentials, specializations, and services</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center font-bold">3</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Get Discovered</h4>
+                                <p class="text-gray-600 text-sm">Appear in search results for nearby pet owners</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="flex-shrink-0 w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center font-bold">4</span>
+                            <div>
+                                <h4 class="font-bold text-dark">Manage Your Presence</h4>
+                                <p class="text-gray-600 text-sm">Update information and track clinic visibility</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Audience -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">👥 Target Audience</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">Pet Owners (Ages 13+)</h3>
+                    <p class="mb-4 opacity-95">Individuals who want to:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="mr-2">✓</span> Manage their pets' health and nutrition</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Access AI-powered care recommendations</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Find and connect with veterinary clinics</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Track their pets' wellness journey</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-br from-secondary to-orange-600 text-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold mb-4">Veterinary Clinics</h3>
+                    <p class="mb-4 opacity-95">Practices looking to:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="mr-2">✓</span> Increase online visibility</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Connect with pet owners</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Showcase services and credentials</li>
+                        <li class="flex items-start"><span class="mr-2">✓</span> Grow their client base</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Privacy -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">🔒 Data Privacy & Security</h2>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <div class="bg-light border-l-4 border-primary rounded-lg p-6 mb-6">
+                    <h4 class="text-xl font-bold text-dark mb-2">FAMMO takes your privacy seriously</h4>
+                    <p class="text-gray-700">We are committed to protecting your data and being transparent about our practices.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold text-dark mb-4">Data We Collect</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                <th class="px-6 py-4 text-left font-semibold">Data Type</th>
+                                <th class="px-6 py-4 text-left font-semibold">Purpose</th>
+                                <th class="px-6 py-4 text-left font-semibold">Optional</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">Email & Name</td>
+                                <td class="px-6 py-4">Account management, authentication</td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">❌ Required</span></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">Pet Information</td>
+                                <td class="px-6 py-4">Generate AI recommendations</td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">❌ Required</span></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">Precise Location</td>
+                                <td class="px-6 py-4">Find nearby clinics</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Optional</span></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">Photos</td>
+                                <td class="px-6 py-4">Pet profiles, clinic logos</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Optional</span></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">Clinic Details</td>
+                                <td class="px-6 py-4">Clinic registration (owners only)</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h3 class="text-2xl font-bold text-dark mb-6">Security Measures</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-start space-x-4">
+                        <span class="text-3xl">🔐</span>
+                        <div>
+                            <h4 class="font-bold text-dark">Encryption</h4>
+                            <p class="text-gray-600 text-sm">All data encrypted in transit (HTTPS)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-3xl">🔒</span>
+                        <div>
+                            <h4 class="font-bold text-dark">Secure Storage</h4>
+                            <p class="text-gray-600 text-sm">Sensitive data encrypted on device</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-3xl">🚫</span>
+                        <div>
+                            <h4 class="font-bold text-dark">No Third-Party Sharing</h4>
+                            <p class="text-gray-600 text-sm">Your data stays with FAMMO</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <span class="text-3xl">✅</span>
+                        <div>
+                            <h4 class="font-bold text-dark">User Control</h4>
+                            <p class="text-gray-600 text-sm">Request data deletion anytime</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Development Status -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">📊 Development Status</h2>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 mb-8">
+                <p class="text-lg font-semibold text-gray-800">
+                    <strong>Current Stage:</strong> Beta Testing (Submitted to Google Play)
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-green-600 mb-6">✅ Completed Features</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ User Authentication</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Biometric Support</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Pet Management</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ AI Nutrition Plans</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ AI Health Reports</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Clinic Discovery</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Clinic Registration</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Multi-Language</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Profile Management</span>
+                    <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">✓ Secure Data Handling</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h3 class="text-2xl font-bold text-orange-600 mb-6">🚀 Coming Soon</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ AI Chat Assistant</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Clinic Messaging</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Appointment Booking</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Medication Reminders</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Vaccination Tracking</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Community Features</span>
+                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">⏳ Social Sharing</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Information -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">🛠️ Technical Information</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-dark mb-6">Built With</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>Framework:</strong> Flutter 3.10.1</li>
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>Backend:</strong> Django REST API (fammo.ai)</li>
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>AI Integration:</strong> Custom AI models</li>
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>Authentication:</strong> JWT tokens with biometric</li>
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>Storage:</strong> Encrypted secure storage</li>
+                        <li class="flex items-start"><span class="text-primary mr-2 font-bold">•</span><strong>APIs:</strong> RESTful API with HTTPS</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-dark mb-6">System Requirements</h3>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200">
+                                <th class="text-left py-3 px-4 font-semibold">Platform</th>
+                                <th class="text-left py-3 px-4 font-semibold">Minimum</th>
+                                <th class="text-left py-3 px-4 font-semibold">Storage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 px-4">Android</td>
+                                <td class="py-3 px-4">5.0+</td>
+                                <td class="py-3 px-4">~50 MB</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">iOS</td>
+                                <td class="py-3 px-4">12.0+</td>
+                                <td class="py-3 px-4">~50 MB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-sm text-gray-600 mt-4 italic">Internet connection required for AI features and clinic discovery</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Medical Disclaimer -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">⚠️ Medical Disclaimer</h2>
+            <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-6">
+                <p class="text-lg font-semibold text-gray-800 mb-3">Important Notice</p>
+                <p class="text-gray-700 leading-relaxed">
+                    FAMMO provides AI-powered recommendations for informational purposes only. <strong>Always consult with a licensed veterinarian</strong> for medical advice and treatment. The app does not diagnose or treat medical conditions. All AI-generated content should be verified with a qualified veterinary professional.
+                </p>
+            </div>
+        </section>
+
+        <!-- Support & Contact -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">📞 Support & Contact</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-primary mb-6">For Users</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 text-xl">✉️</span>
+                            <div>
+                                <strong class="text-dark">Email Support:</strong><br>
+                                <a href="mailto:support@fammo.ai" class="text-primary hover:text-primary-dark transition-colors">support@fammo.ai</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 text-xl">🌐</span>
+                            <div>
+                                <strong class="text-dark">Website:</strong><br>
+                                <a href="https://fammo.ai" class="text-primary hover:text-primary-dark transition-colors">https://fammo.ai</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 text-xl">🗑️</span>
+                            <div>
+                                <strong class="text-dark">Account Deletion:</strong><br>
+                                <a href="https://fammo.ai/delete-account" class="text-primary hover:text-primary-dark transition-colors">fammo.ai/delete-account</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-bold text-secondary mb-6">For Clinics</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-secondary mr-3 text-xl">🤝</span>
+                            <div>
+                                <strong class="text-dark">Partnership Inquiries:</strong><br>
+                                <a href="mailto:partnerships@fammo.ai" class="text-secondary hover:text-orange-600 transition-colors">partnerships@fammo.ai</a>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-secondary mr-3 text-xl">💼</span>
+                            <div>
+                                <strong class="text-dark">Clinic Support:</strong><br>
+                                <a href="mailto:clinic-support@fammo.ai" class="text-secondary hover:text-orange-600 transition-colors">clinic-support@fammo.ai</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- App Store Compliance -->
+        <section class="mb-16 animate-fade-in">
+            <h2 class="text-4xl font-bold text-dark mb-6 border-b-4 border-primary pb-3">📋 App Store Compliance</h2>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-dark mb-6">Age Rating: 13+</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <ul class="space-y-2">
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> No inappropriate content</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> No user-to-user social communication</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Educational and informational content</li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Pet care and health management focus</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-dark mb-3">Content Rating</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">Medical/Health Reference</span>
+                            <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">Educational Focus</span>
+                            <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">General Audiences</span>
+                            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">PEGI 3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download CTA -->
+        <section class="mb-16 animate-fade-in">
+            <div class="bg-gradient-to-r from-primary to-primary-dark text-white rounded-3xl shadow-2xl p-12 text-center">
+                <h3 class="text-3xl md:text-4xl font-bold mb-4">🚀 Download FAMMO</h3>
+                <p class="text-xl mb-6 opacity-95">Coming Soon to Google Play Store and Apple App Store</p>
+                <p class="text-lg mb-8">For beta testing or early access:</p>
+                <a href="mailto:beta@fammo.ai" class="inline-block bg-white text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
+                    Contact Beta Team
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-dark to-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-2xl font-bold mb-4">FAMMO - Because every pet deserves the best care possible. 🐾</p>
+            <div class="border-t border-gray-600 my-8"></div>
+            <p class="text-gray-300 mb-2">Version 1.0.0 | Last Updated: December 18, 2025</p>
+            <p class="text-gray-400">© 2025 FAMMO. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Print Button -->
+    <button onclick="window.print()" class="no-print fixed bottom-8 right-8 bg-primary hover:bg-primary-dark text-white px-6 py-4 rounded-full shadow-2xl transition-all transform hover:scale-110 hover:-translate-y-1 font-bold flex items-center space-x-2 z-50">
+        <span class="text-2xl">🖨️</span>
+        <span>Print</span>
+    </button>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Keyboard shortcut for print
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

@@ -102,25 +102,40 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
     }
   }
 
-  String getCountryCode(String langCode) {
+  String getCountryFlag(String langCode) {
     switch (langCode) {
       case 'en':
-        return 'GB';
+        return '🇬🇧';
       case 'tr':
-        return 'TR';
+        return '🇹🇷';
       case 'nl':
-        return 'NL';
+        return '🇳🇱';
       case 'fi':
-        return 'FI';
+        return '🇫🇮';
       default:
-        return 'GB';
+        return '🇬🇧';
+    }
+  }
+
+  String getWelcomeText(String langCode) {
+    switch (langCode) {
+      case 'en':
+        return 'Welcome';
+      case 'tr':
+        return 'Hoş geldiniz';
+      case 'nl':
+        return 'Welkom';
+      case 'fi':
+        return 'Tervetuloa';
+      default:
+        return 'Welcome';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7F4),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -253,9 +268,9 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: _buildLanguageCard(
-                            countryCode: getCountryCode(lang.code),
+                            countryFlag: getCountryFlag(lang.code),
                             title: lang.name,
-                            subtitle: lang.nativeName,
+                            subtitle: getWelcomeText(lang.code),
                             onTap: () => selectLanguage(lang.code),
                           ),
                         );
@@ -279,36 +294,60 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
   }
 
   Widget _buildLanguageCard({
-    required String countryCode,
+    required String countryFlag,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Country flag circle
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26B5A4).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+              // Country flag
               Container(
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF26B5A4).withOpacity(0.1),
+                      const Color(0xFF26B5A4).withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF26B5A4).withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Text(
-                    countryCode,
+                    countryFlag,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      fontSize: 32,
                     ),
                   ),
                 ),
@@ -345,6 +384,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
                 color: Colors.grey[400],
               ),
             ],
+            ),
           ),
         ),
       ),
