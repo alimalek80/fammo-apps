@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
     ); // This will be updated properly after we get language
     
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F5F3),
+      backgroundColor: Colors.white,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

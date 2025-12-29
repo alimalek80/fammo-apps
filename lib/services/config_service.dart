@@ -32,6 +32,11 @@ class ConfigService {
   
   // Production URL
   static const String _prodUrl = 'https://fammo.ai';
+
+  // Google web client ID used for obtaining an id_token on mobile. Replace with
+  // the web client configured in Google Cloud (the same one Django Allauth uses).
+    static const String googleWebClientId =
+      '957466041070-qla7sp3ipeqrr6rh0p6fp9irj5o95mdl.apps.googleusercontent.com';
   
   // Development URLs
   static const String _androidEmulatorUrl = 'http://10.0.2.2:8000';

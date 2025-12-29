@@ -18,7 +18,7 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF5C01D),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -90,6 +90,13 @@ class BottomNavBar extends StatelessWidget {
     String pageKey,
     bool isActive,
   ) {
+    final decoration = isActive
+        ? BoxDecoration(
+            border: Border.all(color: const Color(0xFFFF9800), width: 1.5),
+            borderRadius: BorderRadius.circular(14),
+          )
+        : null;
+
     return InkWell(
       onTap: () {
         if (pageKey == 'Home' && activePage != 'Home') {
@@ -123,28 +130,33 @@ class BottomNavBar extends StatelessWidget {
         }
         // Chat is TODO
       },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: isActive
-                ? const Color(0xFF26B5A4)
-                : const Color(0xFF7F8C8D),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            localizedLabel,
-            style: TextStyle(
-              fontSize: 11,
+      child: Container
+        ( // Border only when active, no fill
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: decoration,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 24,
               color: isActive
-                  ? const Color(0xFF26B5A4)
-                  : const Color(0xFF7F8C8D),
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  ? Colors.white
+                  : Colors.black,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              localizedLabel,
+              style: TextStyle(
+                fontSize: 11,
+                color: isActive
+                    ? Colors.white
+                    : Colors.black,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -63,6 +63,50 @@ class AuthService {
     }
   }
 
+  Future<bool> loginWithGoogleIdToken(String idToken) async {
+    final baseUrl = await _getBaseUrl();
+    final langCode = await _getLanguageCode();
+
+    final url = Uri.parse('$baseUrl/api/v1/auth/google/');
+
+    print('Attempting Google login via: $url');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': langCode,
+        },
+        body: jsonEncode({'id_token': idToken}),
+      );
+
+      print('Google login status: ${response.statusCode}');
+      print('Google login body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        await storage.write(key: 'access', value: data['access']);
+        await storage.write(key: 'refresh', value: data['refresh']);
+
+        if (data['user'] != null) {
+          await storage.write(key: 'user_email', value: data['user']['email']);
+          await storage.write(key: 'user_id', value: data['user']['id'].toString());
+        }
+
+        print('Google login successful');
+        return true;
+      }
+
+      print('Google login failed with status: ${response.statusCode}');
+      return false;
+    } catch (e) {
+      print('Google login error: $e');
+      return false;
+    }
+  }
+
   Future<String?> getAccessToken() async {
     return storage.read(key: "access");
   }

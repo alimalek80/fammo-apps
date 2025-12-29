@@ -35,6 +35,7 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   app_links: ^6.3.2
   image_picker: ^1.1.2
+  flutter_svg: ^2.0.9
   url_launcher: ^6.3.1
   geolocator: ^12.0.0
   permission_handler: ^11.3.1
@@ -42,6 +43,7 @@ dependencies:
   intl: ^0.19.0
   local_auth: ^2.3.0
   flutter_html: ^3.0.0-beta.2
+  google_sign_in: ^6.2.1
   
   flutter:
     sdk: flutter
@@ -72,6 +74,13 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/dog01.gif
+    - assets/cat01.gif
+    - assets/dog_face_01.svg
+    - assets/cat_face_01.svg
+    - assets/icon/app_icon.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
