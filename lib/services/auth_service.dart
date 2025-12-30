@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'config_service.dart';
 
 class AuthService {
@@ -86,9 +87,17 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        // Backend returns tokens nested under "tokens"; fall back to top-level if available.
+        final accessToken = data['tokens']?['access'] ?? data['access'];
+        final refreshToken = data['tokens']?['refresh'] ?? data['refresh'];
 
-        await storage.write(key: 'access', value: data['access']);
-        await storage.write(key: 'refresh', value: data['refresh']);
+        if (accessToken == null || refreshToken == null) {
+          print('Google login response missing tokens');
+          return false;
+        }
+
+        await storage.write(key: 'access', value: accessToken);
+        await storage.write(key: 'refresh', value: refreshToken);
 
         if (data['user'] != null) {
           await storage.write(key: 'user_email', value: data['user']['email']);
@@ -123,6 +132,19 @@ class AuthService {
   Future<void> logout() async {
     await storage.delete(key: "access");
     await storage.delete(key: "refresh");
+
+    // Also clear Google session so user sees account chooser next time.
+    try {
+      final googleSignIn = GoogleSignIn(
+        scopes: const ['email', 'profile'],
+        clientId: ConfigService.googleWebClientId,
+        serverClientId: ConfigService.googleWebClientId,
+      );
+      await googleSignIn.signOut();
+      await googleSignIn.disconnect();
+    } catch (e) {
+      print('Google sign-out error: $e');
+    }
   }
 
   // Refresh access token using refresh token

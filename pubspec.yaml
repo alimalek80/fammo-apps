@@ -81,6 +81,10 @@ flutter:
     - assets/dog_face_01.svg
     - assets/cat_face_01.svg
     - assets/icon/app_icon.png
+    - assets/pet-nutrition.svg
+    - assets/pet-health.svg
+    - assets/ai-history.svg
+    - assets/clinics.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -97,6 +97,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Clinic Directory'),
         backgroundColor: const Color(0xFF26B5A4),
@@ -290,9 +291,16 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 18,
+            spreadRadius: 1,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            spreadRadius: 0,
+            offset: const Offset(0, 3),
           ),
         ],
       ),

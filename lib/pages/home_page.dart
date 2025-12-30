@@ -11,6 +11,7 @@ import '../models/clinic.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/app_localizations.dart';
 import 'language_selection_page.dart';
 import 'pet_detail_page.dart';
@@ -275,15 +276,15 @@ class _HomePageState extends State<HomePage> {
                           final loc = AppLocalizations(lang);
                           return Row(
                             children: [
-                              _buildQuickAction('🥗', loc.nutritionPlan, Colors.green.shade100, () {
+                              _buildQuickAction('assets/pet-nutrition.svg', loc.nutritionPlan, () {
                                 // Navigate to nutrition
                               }),
                               const SizedBox(width: 12),
-                              _buildQuickAction('💗', loc.healthReport, Colors.pink.shade50, () {
+                              _buildQuickAction('assets/pet-health.svg', loc.healthReport, () {
                                 // Navigate to health
                               }),
                               const SizedBox(width: 12),
-                              _buildQuickAction('📚', loc.aiHistory, Colors.amber.shade50, () {
+                              _buildQuickAction('assets/ai-history.svg', loc.aiHistory, () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -292,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                                 );
                               }),
                               const SizedBox(width: 12),
-                              _buildQuickAction('📍', loc.clinics, Colors.blue.shade50, () {
+                              _buildQuickAction('assets/clinics.svg', loc.clinics, () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -348,12 +349,12 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       loc.edit,
                                       style: const TextStyle(
-                                        color: Color(0xFF26B5A4),
+                                        color: Color(0xFFCC5500),
                                         fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
+                                    const Icon(Icons.chevron_right, color: Color(0xFFCC5500), size: 20),
                                   ],
                                 );
                               },
@@ -426,7 +427,7 @@ class _HomePageState extends State<HomePage> {
                                 return Text(
                                   '+ ${loc.addNewPet}',
                                   style: const TextStyle(
-                                    color: Color(0xFF26B5A4),
+                                    color: Color(0xFFCC5500),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -476,12 +477,12 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       loc.seeAll,
                                       style: const TextStyle(
-                                        color: Color(0xFF26B5A4),
+                                        color: Color(0xFFCC5500),
                                         fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    const Icon(Icons.chevron_right, color: Color(0xFF26B5A4), size: 20),
+                                    const Icon(Icons.chevron_right, color: Color(0xFFCC5500), size: 20),
                                   ],
                                 );
                               },
@@ -534,19 +535,47 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildQuickAction(String emoji, String label, Color bgColor, VoidCallback onTap) {
+  Widget _buildQuickAction(String assetPath, String label, VoidCallback onTap) {
+    const circleColor = Color(0xFFF5C01D); // Matches bottom nav background
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
+          constraints: const BoxConstraints(minHeight: 120),
           decoration: BoxDecoration(
-            color: bgColor,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 18,
+                spreadRadius: 1,
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                spreadRadius: 0,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Column(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: circleColor,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  assetPath,
+                  height: 24,
+                  width: 24,
+                  colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                ),
+              ),
               const SizedBox(height: 8),
               Text(
                 label,
@@ -556,6 +585,8 @@ class _HomePageState extends State<HomePage> {
                   color: Color(0xFF2C3E50),
                   height: 1.2,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -624,9 +655,16 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18,
+              spreadRadius: 1,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -725,6 +763,20 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18,
+              spreadRadius: 1,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
         children: [

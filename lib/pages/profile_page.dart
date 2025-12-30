@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
+import '../widgets/legal_document_viewer.dart';
 import '../utils/app_localizations.dart';
 import 'edit_profile_page.dart';
 import 'edit_clinic_profile_page.dart';
@@ -33,6 +34,18 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadUserProfile();
+  }
+
+  void _openLegalDocument(String docType, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LegalDocumentViewer(
+          docType: docType,
+          title: title,
+        ),
+      ),
+    );
   }
 
   Future<void> _loadUserProfile() async {
@@ -326,14 +339,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             icon: Icons.shield_outlined,
                             title: loc.privacyPolicy,
                             onTap: () {
-                              print('Privacy Policy tapped');
+                              _openLegalDocument('user_privacy', loc.privacyPolicy);
                             },
                           ),
                           _buildMenuItemWithIcon(
                             icon: Icons.description_outlined,
                             title: loc.termsOfService,
                             onTap: () {
-                              print('Terms of Service tapped');
+                              _openLegalDocument('user_terms', loc.termsOfService);
                             },
                           ),
                         ],

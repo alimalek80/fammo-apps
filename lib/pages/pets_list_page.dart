@@ -4,6 +4,8 @@ import '../services/auth_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
 import 'pet_detail_page.dart';
+import 'meal_recommendation_page.dart';
+import 'health_report_page.dart';
 import 'add_pet_page.dart';
 import '../widgets/bottom_nav_bar.dart';
 
@@ -56,7 +58,7 @@ class _PetsListPageState extends State<PetsListPage> {
             'Are you sure you want to delete ${pet.name}? This action cannot be undone.',
             style: const TextStyle(
               fontSize: 14,
-              color: Color(0xFF7F8C8D),
+              color: Color(0xFF2C3E50),
             ),
           ),
           actions: [
@@ -64,28 +66,15 @@ class _PetsListPageState extends State<PetsListPage> {
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text(
                 'Cancel',
-                style: TextStyle(
-                  color: Color(0xFF7F8C8D),
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Color(0xFF7F8C8D)),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.red.withOpacity(0.1),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Delete',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+                size: 20,
               ),
             ),
           ],
@@ -151,7 +140,7 @@ class _PetsListPageState extends State<PetsListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F5F3),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -211,14 +200,21 @@ class _PetsListPageState extends State<PetsListPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF26B5A4),
+                            color: const Color(0xFFF5C01D),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF26B5A4).withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 22,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 12),
+                              ),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 10,
+                                spreadRadius: 0,
+                                offset: const Offset(0, 5),
+                              ),
                           ],
                         ),
                         child: FutureBuilder<String?>(
@@ -230,12 +226,12 @@ class _PetsListPageState extends State<PetsListPage> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.add, color: Colors.white),
+                                  const Icon(Icons.add, color: Colors.black),
                                   const SizedBox(width: 8),
                                   Text(
                                     loc.addNewPet,
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -371,9 +367,16 @@ class _PetsListPageState extends State<PetsListPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18,
+              spreadRadius: 1,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -404,7 +407,7 @@ class _PetsListPageState extends State<PetsListPage> {
                         )
                       : null,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 // Pet Info
                 Expanded(
                   child: Column(
@@ -525,7 +528,7 @@ class _PetsListPageState extends State<PetsListPage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      // Navigate to Nutrition Plan
+                      _navigateToMealRecommendation(pet);
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -562,7 +565,7 @@ class _PetsListPageState extends State<PetsListPage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      // Navigate to Health Report
+                      _navigateToHealthReport(pet);
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -642,42 +645,45 @@ class _PetsListPageState extends State<PetsListPage> {
                 InkWell(
                   onTap: () => _confirmDeletePet(pet),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: const Color(0xFFCC5500),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: FutureBuilder<String?>(
-                      future: LanguageService().getLocalLanguage(),
-                      builder: (context, snapshot) {
-                        final lang = snapshot.data ?? 'en';
-                        final loc = AppLocalizations(lang);
-                        return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              loc.delete,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                      size: 22,
                     ),
                   ),
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToMealRecommendation(Pet pet) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MealRecommendationPage(
+          petId: pet.id,
+          petName: pet.name,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToHealthReport(Pet pet) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HealthReportPage(
+          petId: pet.id,
+          petName: pet.name,
         ),
       ),
     );

@@ -30,11 +30,23 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+        getByName("debug") // keep debug config available
+
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = (keystoreProperties["keyAlias"] as? String)
+                    ?: error("Missing keyAlias in key.properties")
+                keyPassword = (keystoreProperties["keyPassword"] as? String)
+                    ?: error("Missing keyPassword in key.properties")
+                storeFile = file((keystoreProperties["storeFile"] as? String)
+                    ?: error("Missing storeFile in key.properties"))
+                storePassword = (keystoreProperties["storePassword"] as? String)
+                    ?: error("Missing storePassword in key.properties")
+            }
+        } else {
+            create("release") {
+                initWith(getByName("debug"))
+            }
         }
     }
 

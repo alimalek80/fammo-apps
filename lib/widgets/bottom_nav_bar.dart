@@ -92,7 +92,7 @@ class BottomNavBar extends StatelessWidget {
   ) {
     final decoration = isActive
         ? BoxDecoration(
-            border: Border.all(color: const Color(0xFFFF9800), width: 1.5),
+            border: Border.all(color: const Color(0xFFFF9800), width: 3),
             borderRadius: BorderRadius.circular(14),
           )
         : null;

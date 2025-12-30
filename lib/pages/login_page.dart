@@ -113,6 +113,12 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      // Ensure previous session is cleared so the chooser appears.
+      try {
+        await _googleSignIn.disconnect();
+        await _googleSignIn.signOut();
+      } catch (_) {}
+
       final account = await _googleSignIn.signIn();
       if (account == null) {
         if (mounted) {
@@ -634,36 +640,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                // TODO: Implement Apple login
-                              },
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                side: BorderSide.none,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.apple, color: Color(0xFF2C3E50), size: 24),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _localizations?.apple ?? 'Apple',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xFF2C3E50),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -692,12 +668,26 @@ class _LoginPageState extends State<LoginPage> {
                             minimumSize: const Size(0, 0),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: Text(
-                            _localizations?.signUp ?? 'Sign Up',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFCC5500),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              _localizations?.signUp ?? 'Sign Up',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
