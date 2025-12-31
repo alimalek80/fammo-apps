@@ -5,6 +5,7 @@ import '../utils/app_localizations.dart';
 import 'edit_pet_page.dart';
 import 'meal_recommendation_page.dart';
 import 'health_report_page.dart';
+import 'chat_page.dart';
 
 class PetDetailPage extends StatelessWidget {
   final Pet pet;
@@ -25,11 +26,17 @@ class PetDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF2C3E50)),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFF2C3E50),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.edit_outlined, color: Color(0xFF2C3E50)),
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      color: Color(0xFF2C3E50),
+                    ),
                     onPressed: () async {
                       final result = await Navigator.push(
                         context,
@@ -37,7 +44,7 @@ class PetDetailPage extends StatelessWidget {
                           builder: (context) => EditPetPage(pet: pet),
                         ),
                       );
-                      
+
                       if (result == true && context.mounted) {
                         // Refresh the pet list by popping back
                         Navigator.pop(context, true);
@@ -47,7 +54,7 @@ class PetDetailPage extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
@@ -77,7 +84,7 @@ class PetDetailPage extends StatelessWidget {
                           : null,
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Pet Name
                     Text(
                       pet.name,
@@ -88,19 +95,18 @@ class PetDetailPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    
+
                     // Pet Type and Breed
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          pet.petIcon,
-                          style: const TextStyle(fontSize: 20),
-                        ),
+                        Text(pet.petIcon, style: const TextStyle(fontSize: 20)),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            pet.displayPetType.isNotEmpty ? pet.displayPetType : 'Pet',
+                            pet.displayPetType.isNotEmpty
+                                ? pet.displayPetType
+                                : 'Pet',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Color(0xFF7F8C8D),
@@ -122,7 +128,7 @@ class PetDetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Info Cards Container
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -141,7 +147,9 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return Expanded(
                                       child: _buildInfoCard(
                                         icon: Icons.cake_outlined,
@@ -157,12 +165,16 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return Expanded(
                                       child: _buildInfoCard(
                                         icon: Icons.monitor_weight_outlined,
                                         label: loc.weight,
-                                        value: pet.weight != null ? '${pet.weight} kg' : loc.notSpecified,
+                                        value: pet.weight != null
+                                            ? '${pet.weight} kg'
+                                            : loc.notSpecified,
                                         color: const Color(0xFF26B5A4),
                                       ),
                                     );
@@ -173,7 +185,9 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return Expanded(
                                       child: _buildInfoCard(
                                         icon: Icons.fitness_center_outlined,
@@ -187,7 +201,7 @@ class PetDetailPage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          
+
                           // Action Buttons
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -197,7 +211,9 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return _buildActionButton(
                                       icon: Icons.restaurant_outlined,
                                       label: loc.generateNutritionPlan,
@@ -213,7 +229,9 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return _buildActionButton(
                                       icon: Icons.favorite_outline,
                                       label: loc.generateHealthReport,
@@ -229,14 +247,22 @@ class PetDetailPage extends StatelessWidget {
                                   future: LanguageService().getLocalLanguage(),
                                   builder: (context, snapshot) {
                                     String languageCode = snapshot.data ?? 'en';
-                                    AppLocalizations loc = AppLocalizations(languageCode);
+                                    AppLocalizations loc = AppLocalizations(
+                                      languageCode,
+                                    );
                                     return _buildActionButton(
                                       icon: Icons.chat_bubble_outline,
                                       label: loc.askAIAboutPet,
                                       color: Colors.white,
                                       textColor: const Color(0xFF2C3E50),
                                       onTap: () {
-                                        // TODO: Navigate to AI chat
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ChatPage(),
+                                          ),
+                                        );
                                       },
                                     );
                                   },
@@ -249,7 +275,7 @@ class PetDetailPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Allergies Section (Full width)
                     if (_hasAllergies())
                       FutureBuilder<String?>(
@@ -277,7 +303,8 @@ class PetDetailPage extends StatelessWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           loc.allergies,
@@ -302,10 +329,9 @@ class PetDetailPage extends StatelessWidget {
                           );
                         },
                       ),
-                    
-                    if (_hasAllergies())
-                      const SizedBox(height: 16),
-                    
+
+                    if (_hasAllergies()) const SizedBox(height: 16),
+
                     // Current Diet Section (Full width)
                     FutureBuilder<String?>(
                       future: LanguageService().getLocalLanguage(),
@@ -332,7 +358,8 @@ class PetDetailPage extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         loc.currentDiet,
@@ -358,7 +385,7 @@ class PetDetailPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Body Type Section
                     FutureBuilder<String?>(
                       future: LanguageService().getLocalLanguage(),
@@ -384,7 +411,8 @@ class PetDetailPage extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         loc.bodyType,
@@ -420,7 +448,7 @@ class PetDetailPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Food Preference Section
                     FutureBuilder<String?>(
                       future: LanguageService().getLocalLanguage(),
@@ -446,7 +474,8 @@ class PetDetailPage extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         loc.foodPreference,
@@ -474,7 +503,7 @@ class PetDetailPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Treats Section
                     if (pet.treatFrequencyDetail != null)
                       FutureBuilder<String?>(
@@ -501,7 +530,8 @@ class PetDetailPage extends StatelessWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           loc.treats,
@@ -538,9 +568,10 @@ class PetDetailPage extends StatelessWidget {
                       ),
                     if (pet.treatFrequencyDetail != null)
                       const SizedBox(height: 16),
-                    
+
                     // Health Issues Section
-                    if (pet.healthIssuesDetail != null && pet.healthIssuesDetail!.isNotEmpty)
+                    if (pet.healthIssuesDetail != null &&
+                        pet.healthIssuesDetail!.isNotEmpty)
                       FutureBuilder<String?>(
                         future: LanguageService().getLocalLanguage(),
                         builder: (context, snapshot) {
@@ -566,7 +597,8 @@ class PetDetailPage extends StatelessWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           loc.healthIssues,
@@ -580,25 +612,29 @@ class PetDetailPage extends StatelessWidget {
                                         Wrap(
                                           spacing: 8,
                                           runSpacing: 8,
-                                          children: pet.healthIssuesDetail!.map((issue) {
-                                            return Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 6,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                issue['name'] ?? '',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF2C3E50),
+                                          children: pet.healthIssuesDetail!.map(
+                                            (issue) {
+                                              return Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
-                                              ),
-                                            );
-                                          }).toList(),
+                                                child: Text(
+                                                  issue['name'] ?? '',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xFF2C3E50),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ).toList(),
                                         ),
                                       ],
                                     ),
@@ -609,10 +645,11 @@ class PetDetailPage extends StatelessWidget {
                           );
                         },
                       ),
-                    
-                    if (pet.healthIssuesDetail != null && pet.healthIssuesDetail!.isNotEmpty)
+
+                    if (pet.healthIssuesDetail != null &&
+                        pet.healthIssuesDetail!.isNotEmpty)
                       const SizedBox(height: 16),
-                    
+
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -643,10 +680,7 @@ class PetDetailPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF7F8C8D),
-              ),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF7F8C8D)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
@@ -694,11 +728,7 @@ class PetDetailPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: textColor ?? Colors.white,
-              size: 20,
-            ),
+            Icon(icon, color: textColor ?? Colors.white, size: 20),
             const SizedBox(width: 12),
             Flexible(
               child: Text(
@@ -720,7 +750,8 @@ class PetDetailPage extends StatelessWidget {
   }
 
   String _getActivityLevel() {
-    if (pet.activityLevelDetail != null && pet.activityLevelDetail!['name'] != null) {
+    if (pet.activityLevelDetail != null &&
+        pet.activityLevelDetail!['name'] != null) {
       return pet.activityLevelDetail!['name'];
     }
     return 'Not specified';
@@ -728,7 +759,8 @@ class PetDetailPage extends StatelessWidget {
 
   // Localized version of activity level
   String _getLocalizedActivityLevel(AppLocalizations loc) {
-    if (pet.activityLevelDetail != null && pet.activityLevelDetail!['name'] != null) {
+    if (pet.activityLevelDetail != null &&
+        pet.activityLevelDetail!['name'] != null) {
       return pet.activityLevelDetail!['name'];
     }
     return loc.notSpecified;
@@ -741,7 +773,7 @@ class PetDetailPage extends StatelessWidget {
     if (pet.ageYears == null && pet.ageMonths == null && pet.ageWeeks == null) {
       return loc.notSpecified;
     }
-    
+
     List<String> ageParts = [];
     if (pet.ageYears != null && pet.ageYears! > 0) {
       if (pet.ageYears == 1) {
@@ -764,20 +796,20 @@ class PetDetailPage extends StatelessWidget {
         ageParts.add('${pet.ageWeeks} ${loc.weeks}');
       }
     }
-    
+
     return ageParts.isEmpty ? loc.notSpecified : ageParts.join(', ');
   }
 
   bool _hasAllergies() {
-    return pet.foodAllergiesDetail != null && 
-           pet.foodAllergiesDetail!.isNotEmpty;
+    return pet.foodAllergiesDetail != null &&
+        pet.foodAllergiesDetail!.isNotEmpty;
   }
 
   List<Widget> _getAllergyChips() {
     if (pet.foodAllergiesDetail == null || pet.foodAllergiesDetail!.isEmpty) {
       return [];
     }
-    
+
     return pet.foodAllergiesDetail!.map((allergy) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -787,10 +819,7 @@ class PetDetailPage extends StatelessWidget {
         ),
         child: Text(
           allergy['name'] ?? '',
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF2C3E50),
-          ),
+          style: const TextStyle(fontSize: 12, color: Color(0xFF2C3E50)),
         ),
       );
     }).toList();
@@ -816,7 +845,7 @@ class PetDetailPage extends StatelessWidget {
         ),
       ];
     }
-    
+
     return pet.foodTypesDetail!.map((foodType) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -851,42 +880,48 @@ class PetDetailPage extends StatelessWidget {
   }
 
   String _getBodyTypeDescription() {
-    if (pet.bodyTypeDetail != null && pet.bodyTypeDetail!['description'] != null) {
+    if (pet.bodyTypeDetail != null &&
+        pet.bodyTypeDetail!['description'] != null) {
       return pet.bodyTypeDetail!['description'];
     }
     return '';
   }
 
   String _getFoodFeeling() {
-    if (pet.foodFeelingDetail != null && pet.foodFeelingDetail!['name'] != null) {
+    if (pet.foodFeelingDetail != null &&
+        pet.foodFeelingDetail!['name'] != null) {
       return pet.foodFeelingDetail!['name'];
     }
     return 'Not specified';
   }
 
   String _getLocalizedFoodFeeling(AppLocalizations loc) {
-    if (pet.foodFeelingDetail != null && pet.foodFeelingDetail!['name'] != null) {
+    if (pet.foodFeelingDetail != null &&
+        pet.foodFeelingDetail!['name'] != null) {
       return pet.foodFeelingDetail!['name'];
     }
     return loc.notSpecified;
   }
 
   String _getTreatFrequency() {
-    if (pet.treatFrequencyDetail != null && pet.treatFrequencyDetail!['name'] != null) {
+    if (pet.treatFrequencyDetail != null &&
+        pet.treatFrequencyDetail!['name'] != null) {
       return pet.treatFrequencyDetail!['name'];
     }
     return 'Not specified';
   }
 
   String _getLocalizedTreatFrequency(AppLocalizations loc) {
-    if (pet.treatFrequencyDetail != null && pet.treatFrequencyDetail!['name'] != null) {
+    if (pet.treatFrequencyDetail != null &&
+        pet.treatFrequencyDetail!['name'] != null) {
       return pet.treatFrequencyDetail!['name'];
     }
     return loc.notSpecified;
   }
 
   String _getTreatFrequencyDescription() {
-    if (pet.treatFrequencyDetail != null && pet.treatFrequencyDetail!['description'] != null) {
+    if (pet.treatFrequencyDetail != null &&
+        pet.treatFrequencyDetail!['description'] != null) {
       return pet.treatFrequencyDetail!['description'];
     }
     return '';
@@ -896,10 +931,8 @@ class PetDetailPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MealRecommendationPage(
-          petId: pet.id,
-          petName: pet.name,
-        ),
+        builder: (context) =>
+            MealRecommendationPage(petId: pet.id, petName: pet.name),
       ),
     );
   }
@@ -908,10 +941,8 @@ class PetDetailPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HealthReportPage(
-          petId: pet.id,
-          petName: pet.name,
-        ),
+        builder: (context) =>
+            HealthReportPage(petId: pet.id, petName: pet.name),
       ),
     );
   }

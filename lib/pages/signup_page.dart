@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../widgets/paw_loading_indicator.dart';
 
 import '../services/config_service.dart';
 import '../services/language_service.dart';
@@ -202,7 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             imageUrl: logoUrl,
                             fit: BoxFit.contain,
                             placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
+                              child: PawLoadingIndicator(),
                             ),
                             errorWidget: (context, url, error) => const Icon(
                               Icons.pets,
@@ -353,10 +354,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ? const SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
+                                    child: PawLoadingIndicator(size: 24),
                                   )
                                 : Text(
                                     localizations.signUp,

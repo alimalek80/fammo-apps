@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../models/onboarding_model.dart';
 import '../services/onboarding_service.dart';
 import 'login_page.dart';
@@ -96,7 +97,7 @@ class _OnboardingPageState extends State<OnboardingPage> with SingleTickerProvid
       return const Scaffold(
         backgroundColor: Colors.white,
         body: Center(
-          child: CircularProgressIndicator(),
+          child: PawLoadingIndicator(),
         ),
       );
     }
@@ -275,7 +276,7 @@ class _OnboardingPageState extends State<OnboardingPage> with SingleTickerProvid
                     imageUrl: slide.iconUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+                      child: PawLoadingIndicator(),
                     ),
                     errorWidget: (context, url, error) => const Center(
                       child: Icon(Icons.image, size: 80, color: Colors.grey),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/legal_documents_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
+import 'paw_loading_indicator.dart';
 import 'legal_document_viewer.dart';
 
 class LegalAgreements extends StatefulWidget {
@@ -97,7 +98,7 @@ class _LegalAgreementsState extends State<LegalAgreements> {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
+              child: PawLoadingIndicator(),
             ),
           );
         }

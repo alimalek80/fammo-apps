@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../widgets/paw_loading_indicator.dart';
 
 import '../services/config_service.dart';
 import '../services/language_service.dart';
@@ -214,7 +215,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> with Tick
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Center(child: CircularProgressIndicator()),
+                                child: const Center(child: PawLoadingIndicator()),
                               ),
                               errorWidget: (context, url, error) => Container(
                                 decoration: BoxDecoration(
@@ -238,7 +239,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> with Tick
                       );
                     }
                     return _buildAnimatedLogoShell(
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: const Center(child: PawLoadingIndicator()),
                     );
                   },
                 ),
@@ -260,7 +261,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> with Tick
                 ),
                 const SizedBox(height: 16),
                 if (isLoading)
-                  const CircularProgressIndicator()
+                  const PawLoadingIndicator()
                 else
                   Container(
                     constraints: const BoxConstraints(maxWidth: 400),

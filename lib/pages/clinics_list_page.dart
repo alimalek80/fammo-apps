@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../models/clinic.dart';
 import '../services/clinic_service.dart';
 import '../services/location_service.dart';
@@ -27,6 +28,8 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
   final TextEditingController _searchController = TextEditingController();
   String? _selectedCity;
   bool? _eoiFilter;
+  bool? _adminApprovedFilter;
+  double? _distanceFilterKm;
   Position? _userPosition;
   bool _locationPermissionGranted = false;
 
@@ -48,7 +51,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
     });
 
     final hasPermission = await _locationService.requestPermission();
-    
+
     if (hasPermission) {
       _locationPermissionGranted = true;
       final position = await _locationService.getCurrentPosition();
@@ -56,7 +59,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
         _userPosition = position;
       }
     }
-    
+
     await _loadClinics();
   }
 
@@ -66,12 +69,34 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
       _errorMessage = '';
     });
     try {
-      final clinics = await _clinicService.listClinics(
+      var clinics = await _clinicService.listClinics(
         city: _selectedCity,
         eoi: _eoiFilter,
         verifiedEmail: true, // Only get clinics with verified email
+        showAll: true, // include clinics regardless of admin approval
       );
-      
+
+      // Ensure partner filter is applied locally (API may not filter on false)
+      if (_eoiFilter != null) {
+        clinics = clinics
+            .where((clinic) => clinic.clinicEoi == _eoiFilter)
+            .toList();
+      }
+
+      // Admin approval filter (client-side)
+      if (_adminApprovedFilter != null) {
+        clinics = clinics
+            .where((clinic) => clinic.adminApproved == _adminApprovedFilter)
+            .toList();
+      }
+
+      // Distance filter (requires user position)
+      if (_distanceFilterKm != null && _userPosition != null) {
+        clinics = clinics
+            .where((clinic) => _calculateDistance(clinic) <= _distanceFilterKm!)
+            .toList();
+      }
+
       // Sort by distance if user location is available
       if (_userPosition != null) {
         clinics.sort((a, b) {
@@ -80,7 +105,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
           return distanceA.compareTo(distanceB);
         });
       }
-      
+
       setState(() {
         _clinics = clinics;
         _filteredClinics = clinics;
@@ -99,8 +124,12 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Clinic Directory'),
-        backgroundColor: const Color(0xFF26B5A4),
+        title: const Text(
+          'Clinic Directory',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF020080),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -125,13 +154,19 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                 decoration: InputDecoration(
                   hintText: 'Search',
                   hintStyle: const TextStyle(color: Color(0xFF95A5A6)),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF95A5A6)),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Color(0xFF95A5A6),
+                  ),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.tune, color: Color(0xFF95A5A6)),
                     onPressed: _showFilterDialog,
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
                 onChanged: _filterClinics,
               ),
@@ -144,7 +179,7 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFAFAFA),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF26B5A4), width: 1),
+                border: Border.all(color: const Color(0xFF020080), width: 1),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,8 +204,8 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                       icon: const Icon(Icons.add_business),
                       label: const Text('Register your clinic'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF26B5A4),
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFFF5C01D),
+                        foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -192,52 +227,63 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
             const SizedBox(height: 24),
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: PawLoadingIndicator())
                   : _errorMessage.isNotEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                              const SizedBox(height: 16),
-                              Text(
-                                _errorMessage,
-                                style: const TextStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _loadClinics,
-                                child: const Text('Retry'),
-                              ),
-                            ],
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.red,
                           ),
-                        )
-                      : _filteredClinics.isEmpty
-                          ? const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.local_hospital_outlined, size: 64, color: Colors.grey),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'No clinics found',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : RefreshIndicator(
-                              onRefresh: _loadClinics,
-                              child: ListView.builder(
-                                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                                itemCount: _filteredClinics.length,
-                                itemBuilder: (context, index) {
-                                  final clinic = _filteredClinics[index];
-                                  return _buildClinicCard(clinic);
-                                },
-                              ),
-                            ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _errorMessage,
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _loadClinics,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    )
+                  : _filteredClinics.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.local_hospital_outlined,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'No clinics found',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadClinics,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 8,
+                        ),
+                        itemCount: _filteredClinics.length,
+                        itemBuilder: (context, index) {
+                          final clinic = _filteredClinics[index];
+                          return _buildClinicCard(clinic);
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
@@ -250,9 +296,11 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
   void _filterClinics(String query) {
     setState(() {
       _filteredClinics = _clinics
-          .where((clinic) => clinic.name.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (clinic) => clinic.name.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
-      
+
       // Re-sort by distance after filtering
       if (_userPosition != null) {
         _filteredClinics.sort((a, b) {
@@ -264,15 +312,24 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
     });
   }
 
-  // Stub for _calculateDistance
+  double _parseCoordinate(String? value) {
+    if (value == null) return 0.0;
+    final normalized = value.replaceAll(',', '.');
+    return double.tryParse(normalized) ?? 0.0;
+  }
+
   double _calculateDistance(Clinic clinic) {
     if (_userPosition == null) return 0.0;
-    // Replace with actual calculation if needed
-    return Geolocator.distanceBetween(
+
+    final clinicLat = _parseCoordinate(clinic.latitude);
+    final clinicLng = _parseCoordinate(clinic.longitude);
+
+    // locationService returns distance in km; keep consistent with formatter
+    return _locationService.calculateDistance(
       _userPosition!.latitude,
       _userPosition!.longitude,
-      double.tryParse(clinic.latitude ?? '0') ?? 0.0,
-      double.tryParse(clinic.longitude ?? '0') ?? 0.0,
+      clinicLat,
+      clinicLng,
     );
   }
 
@@ -425,7 +482,9 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                           ),
                         const SizedBox(height: 8),
                         Text(
-                          clinic.address.isNotEmpty ? clinic.address : clinic.city,
+                          clinic.address.isNotEmpty
+                              ? clinic.address
+                              : clinic.city,
                           style: const TextStyle(
                             color: Color(0xFF7F8C8D),
                             fontSize: 13,
@@ -444,7 +503,9 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                             const SizedBox(width: 4),
                             Text(
                               _userPosition != null
-                                  ? _locationService.formatDistance(_calculateDistance(clinic))
+                                  ? _locationService.formatDistance(
+                                      _calculateDistance(clinic),
+                                    )
                                   : 'Location unavailable',
                               style: const TextStyle(
                                 color: Color(0xFF7F8C8D),
@@ -461,56 +522,58 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                               const SizedBox(width: 4),
                               Text(
                                 clinic.phone,
-                            style: const TextStyle(
-                              color: Color(0xFF7F8C8D),
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF7F8C8D),
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                        if (clinic.specializations.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: clinic.specializations
+                                .split(',')
+                                .take(3)
+                                .map(
+                                  (spec) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF5F5F5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      spec.trim(),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF7F8C8D),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ],
                       ],
                     ),
-                    if (clinic.specializations.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: clinic.specializations
-                            .split(',')
-                            .take(3)
-                            .map((spec) => Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF5F5F5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    spec.trim(),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF7F8C8D),
-                                    ),
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                    ],
-                  ],
-                ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: Color(0xFF95A5A6),
+                    size: 24,
+                  ),
+                ],
               ),
-              const Icon(
-                Icons.chevron_right,
-                color: Color(0xFF95A5A6),
-                size: 24,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
         ],
       ),
     );
@@ -564,20 +627,38 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                 fillColor: Colors.grey.shade50,
               ),
               items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text('All Cities'),
-                ),
+                const DropdownMenuItem(value: null, child: Text('All Cities')),
                 ..._getUniqueCities().map((city) {
-                  return DropdownMenuItem(
-                    value: city,
-                    child: Text(city),
-                  );
+                  return DropdownMenuItem(value: city, child: Text(city));
                 }),
               ],
               onChanged: (value) {
                 setState(() {
                   _selectedCity = value;
+                });
+                _loadClinics();
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<bool?>(
+              value: _adminApprovedFilter,
+              decoration: InputDecoration(
+                labelText: 'Admin Approved (FAMMO)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+              items: const [
+                DropdownMenuItem(value: null, child: Text('All')),
+                DropdownMenuItem(value: true, child: Text('Approved')),
+                DropdownMenuItem(value: false, child: Text('Not Approved')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _adminApprovedFilter = value;
                 });
                 _loadClinics();
                 Navigator.pop(context);
@@ -595,22 +676,42 @@ class _ClinicsListPageState extends State<ClinicsListPage> {
                 fillColor: Colors.grey.shade50,
               ),
               items: const [
-                DropdownMenuItem(
-                  value: null,
-                  child: Text('All Clinics'),
-                ),
+                DropdownMenuItem(value: null, child: Text('All Clinics')),
                 DropdownMenuItem(
                   value: true,
                   child: Text('FAMO Partners Only'),
                 ),
-                DropdownMenuItem(
-                  value: false,
-                  child: Text('Non-Partners'),
-                ),
+                DropdownMenuItem(value: false, child: Text('Non-Partners')),
               ],
               onChanged: (value) {
                 setState(() {
                   _eoiFilter = value;
+                });
+                _loadClinics();
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<double?>(
+              value: _distanceFilterKm,
+              decoration: InputDecoration(
+                labelText: 'Distance',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+              items: const [
+                DropdownMenuItem(value: null, child: Text('Any distance')),
+                DropdownMenuItem(value: 2.0, child: Text('Within 2 km')),
+                DropdownMenuItem(value: 5.0, child: Text('Within 5 km')),
+                DropdownMenuItem(value: 10.0, child: Text('Within 10 km')),
+                DropdownMenuItem(value: 20.0, child: Text('Within 20 km')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _distanceFilterKm = value;
                 });
                 _loadClinics();
                 Navigator.pop(context);

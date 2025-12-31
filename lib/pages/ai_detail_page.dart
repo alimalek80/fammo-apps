@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/auth_service.dart';
 import '../services/config_service.dart';
 import '../services/language_service.dart';
@@ -105,7 +106,7 @@ class _AIDetailPageState extends State<AIDetailPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: PawLoadingIndicator(),
             );
           }
 

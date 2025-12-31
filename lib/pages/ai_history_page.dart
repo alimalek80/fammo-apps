@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/auth_service.dart';
 import '../services/config_service.dart';
 import '../services/language_service.dart';
@@ -405,7 +406,7 @@ class _AIHistoryPageState extends State<AIHistoryPage> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(),
+              child: PawLoadingIndicator(),
             )
           : SingleChildScrollView(
               child: Column(

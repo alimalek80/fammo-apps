@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/auth_service.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -203,10 +204,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          ),
+                          child: PawLoadingIndicator(size: 20),
                         )
                       : const Text(
                           'Send Reset Link',

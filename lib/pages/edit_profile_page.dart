@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/user_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -311,11 +312,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                          child: PawLoadingIndicator(size: 20),
                         )
                       : Text(
                           loc.saveChanges,

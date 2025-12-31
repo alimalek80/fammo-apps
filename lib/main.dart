@@ -9,6 +9,7 @@ import 'services/language_service.dart';
 import 'services/config_service.dart';
 import 'services/deep_link_service.dart';
 import 'services/clinic_service.dart';
+import 'widgets/paw_loading_indicator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -154,7 +155,7 @@ class _MyAppState extends State<MyApp> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(),
+              const PawLoadingIndicator(),
               const SizedBox(height: 16),
               const Text('Confirming your email...'),
             ],
@@ -464,10 +465,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFE0F7F4),
+    return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: CircularProgressIndicator(),
+        child: PawLoadingIndicator(size: 80),
       ),
     );
   }

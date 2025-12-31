@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import '../widgets/paw_loading_indicator.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/clinic_service.dart';
 import '../services/auth_service.dart';
@@ -343,7 +344,7 @@ class _EditClinicProfilePageState extends State<EditClinicProfilePage> {
             ),
           ),
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(child: PawLoadingIndicator()),
       );
     }
 
@@ -699,11 +700,7 @@ class _EditClinicProfilePageState extends State<EditClinicProfilePage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                          child: PawLoadingIndicator(size: 20),
                         )
                       : const Text(
                           'Save Changes',

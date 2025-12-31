@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../pages/home_page.dart';
 import '../pages/pets_list_page.dart';
 import '../pages/clinics_list_page.dart';
+import '../pages/chat_page.dart';
 import '../pages/profile_page.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -9,10 +10,7 @@ import '../utils/app_localizations.dart';
 class BottomNavBar extends StatelessWidget {
   final String activePage;
 
-  const BottomNavBar({
-    required this.activePage,
-    super.key,
-  });
+  const BottomNavBar({required this.activePage, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,7 @@ class BottomNavBar extends StatelessWidget {
             builder: (context, snapshot) {
               String languageCode = snapshot.data ?? 'en';
               AppLocalizations loc = AppLocalizations(languageCode);
-              
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -102,56 +100,44 @@ class BottomNavBar extends StatelessWidget {
         if (pageKey == 'Home' && activePage != 'Home') {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else if (pageKey == 'Pets' && activePage != 'Pets') {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const PetsListPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const PetsListPage()),
           );
         } else if (pageKey == 'Clinics' && activePage != 'Clinics') {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ClinicsListPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ClinicsListPage()),
           );
         } else if (pageKey == 'Profile' && activePage != 'Profile') {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ProfilePage(),
-            ),
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
+        } else if (pageKey == 'Chat' && activePage != 'Chat') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatPage()),
           );
         }
-        // Chat is TODO
       },
-      child: Container
-        ( // Border only when active, no fill
+      child: Container(
+        // Border only when active, no fill
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: decoration,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 24,
-              color: isActive
-                  ? Colors.white
-                  : Colors.black,
-            ),
+            Icon(icon, size: 24, color: isActive ? Colors.white : Colors.black),
             const SizedBox(height: 4),
             Text(
               localizedLabel,
               style: TextStyle(
                 fontSize: 11,
-                color: isActive
-                    ? Colors.white
-                    : Colors.black,
+                color: isActive ? Colors.white : Colors.black,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

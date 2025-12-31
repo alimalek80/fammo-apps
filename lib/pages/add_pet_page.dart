@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/pet_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -329,7 +330,7 @@ class _AddPetPageState extends State<AddPetPage> {
             centerTitle: true,
           ),
           body: _loadingOptions
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4ECDC4)))
+              ? const Center(child: PawLoadingIndicator())
               : Column(
                   children: [
                     // Progress Indicator
@@ -1178,10 +1179,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
+                    child: PawLoadingIndicator(size: 20),
                   )
                 : Text(
                     _currentStep == 2 ? loc.save : loc.next,

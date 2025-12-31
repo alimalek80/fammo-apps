@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/pet_service.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
@@ -7,6 +8,7 @@ import 'pet_detail_page.dart';
 import 'meal_recommendation_page.dart';
 import 'health_report_page.dart';
 import 'add_pet_page.dart';
+import 'chat_page.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class PetsListPage extends StatefulWidget {
@@ -29,9 +31,9 @@ class _PetsListPageState extends State<PetsListPage> {
 
   Future<void> _loadPets() async {
     setState(() => _isLoading = true);
-    
+
     final pets = await _petService.getUserPets();
-    
+
     setState(() {
       _pets = pets;
       _isLoading = false;
@@ -56,10 +58,7 @@ class _PetsListPageState extends State<PetsListPage> {
           ),
           content: Text(
             'Are you sure you want to delete ${pet.name}? This action cannot be undone.',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF2C3E50),
-            ),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF2C3E50)),
           ),
           actions: [
             TextButton(
@@ -90,9 +89,9 @@ class _PetsListPageState extends State<PetsListPage> {
   Future<void> _deletePet(Pet pet) async {
     try {
       setState(() => _isLoading = true);
-      
+
       final success = await _petService.deletePet(pet.id);
-      
+
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -104,7 +103,7 @@ class _PetsListPageState extends State<PetsListPage> {
             ),
           ),
         );
-        
+
         // Refresh the list
         _loadPets();
       } else if (mounted) {
@@ -166,7 +165,7 @@ class _PetsListPageState extends State<PetsListPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : SafeArea(
               child: Column(
                 children: [
@@ -192,7 +191,7 @@ class _PetsListPageState extends State<PetsListPage> {
                             builder: (context) => const AddPetPage(),
                           ),
                         );
-                        
+
                         if (result == true && mounted) {
                           _loadPets();
                         }
@@ -200,21 +199,21 @@ class _PetsListPageState extends State<PetsListPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFF5C01D),
+                          color: const Color(0xFFF5C01D),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.12),
-                                blurRadius: 22,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 12),
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: const Offset(0, 5),
-                              ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 22,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 12),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 5),
+                            ),
                           ],
                         ),
                         child: FutureBuilder<String?>(
@@ -311,13 +310,13 @@ class _PetsListPageState extends State<PetsListPage> {
   String _getLocalizedAge(Pet pet, AppLocalizations loc) {
     // Use the age_display from API if it's in the correct language (future enhancement)
     // For now, format locally with localization
-    
+
     if (pet.ageYears == null && pet.ageMonths == null && pet.ageWeeks == null) {
       return '${loc.age} unknown';
     }
-    
+
     List<String> ageParts = [];
-    
+
     if (pet.ageYears != null && pet.ageYears! > 0) {
       if (pet.ageYears == 1) {
         ageParts.add('${pet.ageYears} ${loc.year}');
@@ -325,7 +324,7 @@ class _PetsListPageState extends State<PetsListPage> {
         ageParts.add('${pet.ageYears} ${loc.years}');
       }
     }
-    
+
     if (pet.ageMonths != null && pet.ageMonths! > 0) {
       if (pet.ageMonths == 1) {
         ageParts.add('${pet.ageMonths} ${loc.month}');
@@ -333,15 +332,18 @@ class _PetsListPageState extends State<PetsListPage> {
         ageParts.add('${pet.ageMonths} ${loc.months}');
       }
     }
-    
-    if (pet.ageWeeks != null && pet.ageWeeks! > 0 && (pet.ageYears == null || pet.ageYears! == 0) && (pet.ageMonths == null || pet.ageMonths! == 0)) {
+
+    if (pet.ageWeeks != null &&
+        pet.ageWeeks! > 0 &&
+        (pet.ageYears == null || pet.ageYears! == 0) &&
+        (pet.ageMonths == null || pet.ageMonths! == 0)) {
       if (pet.ageWeeks == 1) {
         ageParts.add('${pet.ageWeeks} ${loc.week}');
       } else {
         ageParts.add('${pet.ageWeeks} ${loc.weeks}');
       }
     }
-    
+
     return ageParts.isEmpty ? '${loc.age} unknown' : ageParts.join(' ');
   }
 
@@ -350,11 +352,9 @@ class _PetsListPageState extends State<PetsListPage> {
       onTap: () async {
         final result = await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => PetDetailPage(pet: pet),
-          ),
+          MaterialPageRoute(builder: (context) => PetDetailPage(pet: pet)),
         );
-        
+
         if (result == true && mounted) {
           _loadPets();
         }
@@ -428,9 +428,12 @@ class _PetsListPageState extends State<PetsListPage> {
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: pet.petType == 2 
+                              color: pet.petType == 2
                                   ? Colors.purple.withOpacity(0.1)
                                   : Colors.orange.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
@@ -441,17 +444,22 @@ class _PetsListPageState extends State<PetsListPage> {
                                 final lang = snapshot.data ?? 'en';
                                 final loc = AppLocalizations(lang);
                                 // Determine pet type label based on petType id
-                                String petTypeLabel = pet.petType == 2 ? loc.cat : loc.dog;
+                                String petTypeLabel = pet.petType == 2
+                                    ? loc.cat
+                                    : loc.dog;
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(pet.petIcon, style: const TextStyle(fontSize: 14)),
+                                    Text(
+                                      pet.petIcon,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       petTypeLabel,
                                       style: TextStyle(
                                         fontSize: 10,
-                                        color: pet.petType == 2 
+                                        color: pet.petType == 2
                                             ? Colors.purple
                                             : Colors.orange,
                                         fontWeight: FontWeight.w600,
@@ -481,7 +489,11 @@ class _PetsListPageState extends State<PetsListPage> {
                           final loc = AppLocalizations(lang);
                           return Row(
                             children: [
-                              const Icon(Icons.cake, size: 14, color: Color(0xFF7F8C8D)),
+                              const Icon(
+                                Icons.cake,
+                                size: 14,
+                                color: Color(0xFF7F8C8D),
+                              ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
@@ -494,8 +506,18 @@ class _PetsListPageState extends State<PetsListPage> {
                                 ),
                               ),
                               if (pet.weight != null) ...[
-                                const Text(' • ', style: TextStyle(color: Color(0xFF7F8C8D), fontSize: 12)),
-                                const Icon(Icons.monitor_weight, size: 14, color: Color(0xFF7F8C8D)),
+                                const Text(
+                                  ' • ',
+                                  style: TextStyle(
+                                    color: Color(0xFF7F8C8D),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.monitor_weight,
+                                  size: 14,
+                                  color: Color(0xFF7F8C8D),
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${pet.weight} kg',
@@ -544,7 +566,11 @@ class _PetsListPageState extends State<PetsListPage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.restaurant, size: 16, color: Color(0xFF26B5A4)),
+                              const Icon(
+                                Icons.restaurant,
+                                size: 16,
+                                color: Color(0xFF26B5A4),
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 loc.nutritionPlanButton,
@@ -581,7 +607,11 @@ class _PetsListPageState extends State<PetsListPage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.favorite, size: 16, color: Colors.pink.shade400),
+                              Icon(
+                                Icons.favorite,
+                                size: 16,
+                                color: Colors.pink.shade400,
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 loc.healthReportButton,
@@ -607,7 +637,12 @@ class _PetsListPageState extends State<PetsListPage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      // Navigate to AI Chat
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatPage(),
+                        ),
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -623,7 +658,11 @@ class _PetsListPageState extends State<PetsListPage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.chat_bubble_outline, size: 16, color: Colors.amber.shade700),
+                              Icon(
+                                Icons.chat_bubble_outline,
+                                size: 16,
+                                color: Colors.amber.shade700,
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 loc.chatWithAI,
@@ -669,10 +708,8 @@ class _PetsListPageState extends State<PetsListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MealRecommendationPage(
-          petId: pet.id,
-          petName: pet.name,
-        ),
+        builder: (context) =>
+            MealRecommendationPage(petId: pet.id, petName: pet.name),
       ),
     );
   }
@@ -681,10 +718,8 @@ class _PetsListPageState extends State<PetsListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HealthReportPage(
-          petId: pet.id,
-          petName: pet.name,
-        ),
+        builder: (context) =>
+            HealthReportPage(petId: pet.id, petName: pet.name),
       ),
     );
   }

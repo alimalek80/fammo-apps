@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/notification_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -137,7 +138,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
           ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : SingleChildScrollView(
               child: Column(
                 children: [

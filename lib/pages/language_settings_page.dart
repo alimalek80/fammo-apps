@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/language_service.dart';
 import '../services/config_service.dart';
 import '../services/onboarding_service.dart';
@@ -126,7 +127,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(

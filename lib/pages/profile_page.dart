@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
@@ -100,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           body: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: PawLoadingIndicator())
               : _userProfile == null
                   ? Center(child: Text(loc.failedToLoadProfile))
                   : SingleChildScrollView(

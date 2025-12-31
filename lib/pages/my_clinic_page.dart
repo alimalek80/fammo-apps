@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../models/clinic.dart';
 import '../services/clinic_service.dart';
 import 'add_edit_clinic_page.dart';
@@ -144,7 +145,7 @@ class _MyClinicPageState extends State<MyClinicPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : _errorMessage.isNotEmpty
               ? Center(
                   child: Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
+import '../widgets/paw_loading_indicator.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -639,7 +640,7 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
                   icon: isLoadingLocation 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(width: 16, height: 16, child: PawLoadingIndicator(size: 16))
                     : const Icon(Icons.my_location),
                   label: const Text('Get Current Location'),
                   onPressed: isLoadingLocation ? null : _getCurrentLocation,
@@ -1234,10 +1235,7 @@ class _ClinicRegistrationPageState extends State<ClinicRegistrationPage> {
                                 ? const SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
+                                    child: PawLoadingIndicator(size: 24),
                                   )
                                 : Text(
                                     _currentStep < 5 ? 'Next' : 'Register Clinic',

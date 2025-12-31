@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/clinic_service.dart';
 import '../models/clinic.dart';
 
@@ -164,9 +165,7 @@ class _EditClinicWorkingHoursPageState extends State<EditClinicWorkingHoursPage>
           ),
         ),
         body: const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF26B5A4)),
-          ),
+          child: PawLoadingIndicator(),
         ),
       );
     }
@@ -240,11 +239,7 @@ class _EditClinicWorkingHoursPageState extends State<EditClinicWorkingHoursPage>
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                          child: PawLoadingIndicator(size: 20),
                         )
                       : const Text(
                           'Save Working Hours',

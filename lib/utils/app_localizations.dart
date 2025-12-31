@@ -213,6 +213,16 @@ class AppLocalizations {
       'pleaseAcceptRequiredTerms': 'Please accept all required terms to continue',
       'errorLoadingDocument': 'Error loading document. Please try again.',
       'retry': 'Retry',
+      'chatHistory': 'Chat History',
+      'newChat': 'New Chat',
+      'noChatHistory': 'No chat history',
+      'untitledChat': 'Untitled Chat',
+      'welcomeToChat': 'Welcome to Fammo AI',
+      'chatWelcomeMessage': 'Ask me anything about your pet\'s health, nutrition, or care. I\'m here to help!',
+      'typeMessage': 'Type a message...',
+      'sendingMessage': 'Sending...',
+      'failedToSendMessage': 'Failed to send message',
+      'networkError': 'Network error. Please check your connection.',
     },
     'tr': {
       'login': 'Giriş Yap',
@@ -423,6 +433,16 @@ class AppLocalizations {
       'pleaseAcceptRequiredTerms': 'Devam etmek için gerekli tüm şartları kabul edin',
       'errorLoadingDocument': 'Döküman yüklenirken hata oluştu. Lütfen tekrar deneyin.',
       'retry': 'Tekrar Dene',
+      'chatHistory': 'Sohbet Geçmişi',
+      'newChat': 'Yeni Sohbet',
+      'noChatHistory': 'Sohbet geçmişi yok',
+      'untitledChat': 'Adsız Sohbet',
+      'welcomeToChat': 'Fammo AI\'ye Hoşgeldiniz',
+      'chatWelcomeMessage': 'Evcil hayvanınızın sağlığı, beslenmesi veya bakımı hakkında bana her şeyi sorabilirsiniz. Yardımcı olmak için buradayım!',
+      'typeMessage': 'Bir mesaj yazın...',
+      'sendingMessage': 'Gönderiliyor...',
+      'failedToSendMessage': 'Mesaj gönderilemedi',
+      'networkError': 'Ağ hatası. Lütfen bağlantınızı kontrol edin.',
     },
     'fi': {
       'login': 'Kirjaudu sisään',
@@ -633,6 +653,16 @@ class AppLocalizations {
       'pleaseAcceptRequiredTerms': 'Hyväksy kaikki vaaditut ehdot jatkaaksesi',
       'errorLoadingDocument': 'Virhe dokumentin latauksessa. Yritä uudelleen.',
       'retry': 'Yritä uudelleen',
+      'chatHistory': 'Keskusteluhistoria',
+      'newChat': 'Uusi keskustelu',
+      'noChatHistory': 'Ei keskusteluhistoriaa',
+      'untitledChat': 'Nimetön keskustelu',
+      'welcomeToChat': 'Tervetuloa Fammo AI:hin',
+      'chatWelcomeMessage': 'Kysy minulta mitä tahansa lemmikkisi terveydestä, ravitsemuksesta tai hoidosta. Olen täällä auttaakseni!',
+      'typeMessage': 'Kirjoita viesti...',
+      'sendingMessage': 'Lähetetään...',
+      'failedToSendMessage': 'Viestin lähetys epäonnistui',
+      'networkError': 'Verkkovirhe. Tarkista yhteys.',
     },
     'nl': {
       'login': 'Inloggen',
@@ -843,6 +873,16 @@ class AppLocalizations {
       'pleaseAcceptRequiredTerms': 'Accepteer alle vereiste voorwaarden om door te gaan',
       'errorLoadingDocument': 'Fout bij laden van document. Probeer opnieuw.',
       'retry': 'Opnieuw proberen',
+      'chatHistory': 'Chatgeschiedenis',
+      'newChat': 'Nieuwe Chat',
+      'noChatHistory': 'Geen chatgeschiedenis',
+      'untitledChat': 'Naamloze Chat',
+      'welcomeToChat': 'Welkom bij Fammo AI',
+      'chatWelcomeMessage': 'Vraag me alles over de gezondheid, voeding of verzorging van uw huisdier. Ik ben hier om te helpen!',
+      'typeMessage': 'Typ een bericht...',
+      'sendingMessage': 'Verzenden...',
+      'failedToSendMessage': 'Bericht verzenden mislukt',
+      'networkError': 'Netwerkfout. Controleer uw verbinding.',
     },
   };
 
@@ -1058,4 +1098,14 @@ class AppLocalizations {
   String get pleaseAcceptRequiredTerms => translate('pleaseAcceptRequiredTerms');
   String get errorLoadingDocument => translate('errorLoadingDocument');
   String get retry => translate('retry');
+  String get chatHistory => translate('chatHistory');
+  String get newChat => translate('newChat');
+  String get noChatHistory => translate('noChatHistory');
+  String get untitledChat => translate('untitledChat');
+  String get welcomeToChat => translate('welcomeToChat');
+  String get chatWelcomeMessage => translate('chatWelcomeMessage');
+  String get typeMessage => translate('typeMessage');
+  String get sendingMessage => translate('sendingMessage');
+  String get failedToSendMessage => translate('failedToSendMessage');
+  String get networkError => translate('networkError');
 }

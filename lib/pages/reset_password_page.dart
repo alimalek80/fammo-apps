@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/auth_service.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -205,7 +206,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const PawLoadingIndicator(size: 24)
                       : const Text(
                           'Reset Password',
                           style: TextStyle(

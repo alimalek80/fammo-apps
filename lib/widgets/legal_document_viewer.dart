@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'paw_loading_indicator.dart';
 import '../services/legal_documents_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -86,7 +87,7 @@ class _LegalDocumentViewerState extends State<LegalDocumentViewer> {
   Widget _buildBody(AppLocalizations loc) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: PawLoadingIndicator(),
       );
     }
 

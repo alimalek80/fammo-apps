@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
 import '../utils/app_localizations.dart';
@@ -268,10 +269,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          ),
+                          child: PawLoadingIndicator(size: 20),
                         )
                       : Text(
                           loc.changePasswordTitle,

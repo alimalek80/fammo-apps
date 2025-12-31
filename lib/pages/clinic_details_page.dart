@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import '../widgets/paw_loading_indicator.dart';
 import '../models/clinic.dart';
 import '../services/clinic_service.dart';
 
@@ -121,7 +122,7 @@ class _ClinicDetailsPageState extends State<ClinicDetailsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5F3),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : _errorMessage.isNotEmpty
               ? Center(
                   child: Column(

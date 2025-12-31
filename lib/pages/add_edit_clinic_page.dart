@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../widgets/paw_loading_indicator.dart';
 import '../models/clinic.dart';
 import '../services/clinic_service.dart';
 
@@ -219,7 +220,7 @@ class _AddEditClinicPageState extends State<AddEditClinicPage> {
         title: Text(widget.clinic == null ? 'Register Clinic' : 'Edit Clinic'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawLoadingIndicator())
           : Form(
               key: _formKey,
               child: Stepper(

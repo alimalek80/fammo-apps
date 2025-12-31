@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/paw_loading_indicator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../services/auth_service.dart';
 import '../services/language_service.dart';
@@ -397,7 +398,7 @@ class _LoginPageState extends State<LoginPage> {
                                       imageUrl: logoUrl,
                                       fit: BoxFit.contain,
                                       placeholder: (context, url) => const Center(
-                                        child: CircularProgressIndicator(),
+                                        child: PawLoadingIndicator(),
                                       ),
                                       errorWidget: (context, url, error) => const Icon(
                                         Icons.pets,
@@ -532,10 +533,7 @@ class _LoginPageState extends State<LoginPage> {
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
+                                child: PawLoadingIndicator(size: 24),
                               )
                             : Text(
                                 _localizations?.login ?? 'Log In',
@@ -616,7 +614,7 @@ class _LoginPageState extends State<LoginPage> {
                                     const SizedBox(
                                       width: 20,
                                       height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: PawLoadingIndicator(size: 20),
                                     )
                                   else ...[
                                     Image.network(

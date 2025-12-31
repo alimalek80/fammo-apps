@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import '../widgets/paw_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/config_service.dart';
@@ -104,7 +105,7 @@ class _MealRecommendationPageState extends State<MealRecommendationPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
+                  PawLoadingIndicator(),
                   SizedBox(height: 16),
                   Text('Generating nutrition plan...'),
                 ],
