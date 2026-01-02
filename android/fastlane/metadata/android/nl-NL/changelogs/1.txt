@@ -1,0 +1,16 @@
+🎉 Welkom bij FAMMO v1.0.0!
+
+We zijn verheugd om FAMMO te lanceren - jouw AI-aangedreven huisdier zorgpartner!
+
+✨ Functies in deze release:
+• Huisdierbeheer - Voeg meerdere huisdieren toe en beheer ze met gedetailleerde profielen
+• AI Voedingsplannen - Krijg gepersonaliseerde maaltijdaanbevelingen voor je huisdieren
+• AI Gezondheidsrapporten - Genereer uitgebreide gezondheidsbeoordelingen
+• Kliniek Ontdekken - Vind dierenklinieken bij jou in de buurt
+• Kliniek Registratie - Dierenartsen kunnen hun klinieken registreren en beheren
+• Meertalige Ondersteuning - Engels, Turks, Fins en Nederlands
+• Biometrische Login - Veilige toegang met vingerafdruk of Face ID
+• Mooie UI - Modern, intuïtief ontwerp met donkere/lichte modus
+
+Bedankt voor het kiezen van FAMMO! We horen graag je feedback.
+Neem contact met ons op via support@fammo.ai

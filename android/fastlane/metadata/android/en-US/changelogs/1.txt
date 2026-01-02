@@ -1,0 +1,16 @@
+🎉 Welcome to FAMMO v1.0.0!
+
+We're excited to launch FAMMO - your AI-powered pet care companion!
+
+✨ Features in this release:
+• Pet Management - Add and manage multiple pets with detailed profiles
+• AI Nutrition Plans - Get personalized meal recommendations for your pets
+• AI Health Reports - Generate comprehensive health assessments
+• Clinic Discovery - Find veterinary clinics near you
+• Clinic Registration - Vets can register and manage their clinics
+• Multi-language Support - English, Turkish, Finnish, and Dutch
+• Biometric Login - Secure access with fingerprint or Face ID
+• Beautiful UI - Modern, intuitive design with dark/light mode
+
+Thank you for choosing FAMMO! We'd love to hear your feedback.
+Contact us at support@fammo.ai

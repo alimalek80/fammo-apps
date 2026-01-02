@@ -1,0 +1,5 @@
+# FAMMO Android Fastlane Configuration
+
+# App identifier (package name)
+json_key_file("fastlane/google-play-key.json") # Path to the json file used to authenticate with Google Play
+package_name("ai.fammo.app") # Package name

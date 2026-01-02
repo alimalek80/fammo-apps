@@ -1,0 +1,56 @@
+FAMMO - Your AI-Powered Pet Care Companion
+
+Transform the way you care for your furry friends with FAMMO, the intelligent pet health and nutrition management app that puts the power of artificial intelligence at your fingertips.
+
+🐾 SMART PET MANAGEMENT
+• Manage multiple pets (dogs & cats) in one convenient place
+• Create detailed profiles with photos, health conditions, and dietary preferences
+• Track weight, activity level, and body type over time
+• Store medical history and food allergies safely
+
+🍽️ AI-POWERED NUTRITION PLANS
+• Get personalized meal recommendations tailored to your pet's unique needs
+• Receive feeding schedules with precise portion sizes
+• View complete nutritional breakdowns for each meal plan
+• Access safety notes and important dietary warnings
+
+🏥 COMPREHENSIVE HEALTH MONITORING
+• Generate AI health reports based on your pet's profile
+• Receive personalized care recommendations
+• Track health history and monitor existing conditions
+• Get evidence-based wellness suggestions
+
+🏥 FIND VETERINARY CARE
+• Discover veterinary clinics near you
+• Search by name, location, or specialization
+• View clinic details including working hours and credentials
+• Contact clinics directly via phone, email, or website
+• Find EOI (Eyes on Initiative) partner clinics
+
+👨‍⚕️ FOR VETERINARY CLINICS
+• Register your clinic and increase online visibility
+• Showcase veterinarian credentials and specializations
+• Manage working hours and clinic information
+• Upload your clinic logo for brand recognition
+• Connect with pet owners in your area
+
+🔐 SECURE & PRIVATE
+• Biometric authentication (fingerprint/Face ID)
+• All data encrypted and transmitted securely
+• Full control over your privacy settings
+• GDPR compliant data handling
+
+🌍 MULTILINGUAL SUPPORT
+Available in English, Turkish, Finnish, and Dutch
+
+WHY PET OWNERS LOVE FAMMO:
+✓ AI-powered intelligence for personalized pet care
+✓ All-in-one platform for health, nutrition, and vet care
+✓ Evidence-based recommendations from veterinary science
+✓ Intuitive, beautiful interface designed for everyone
+✓ Your pet's information always at your fingertips
+
+Download FAMMO today and give your pets the care they deserve!
+
+Questions or feedback? Contact us at support@fammo.ai
+Visit us at https://fammo.ai

@@ -1,0 +1,16 @@
+🎉 Tervetuloa FAMMO v1.0.0:aan!
+
+Olemme innoissamme julkaistaessamme FAMMOn - tekoälyllä toimivan lemmikkihoitokumppanisi!
+
+✨ Tämän version ominaisuudet:
+• Lemmikkien hallinta - Lisää ja hallitse useita lemmikkejä yksityiskohtaisilla profiileilla
+• Tekoälyravitsemussuunnitelmat - Saa personoituja ateriasuosituksia lemmikeillesi
+• Tekoälyterveysraportit - Luo kattavia terveysarvioita
+• Klinikoiden löytäminen - Löydä eläinlääkäriasemat läheltäsi
+• Klinikan rekisteröinti - Eläinlääkärit voivat rekisteröidä ja hallita klinikoitaan
+• Monikielinen tuki - Englanti, turkki, suomi ja hollanti
+• Biometrinen kirjautuminen - Turvallinen pääsy sormenjäljellä tai Face ID:llä
+• Kaunis käyttöliittymä - Moderni, intuitiivinen muotoilu tumma/vaalea-tilalla
+
+Kiitos kun valitsit FAMMOn! Haluaisimme kuulla palautteesi.
+Ota yhteyttä: support@fammo.ai

@@ -1,0 +1,56 @@
+FAMMO - Yapay Zeka Destekli Evcil Hayvan Bakım Asistanınız
+
+Tüylü dostlarınıza bakım şeklinizi FAMMO ile dönüştürün. Yapay zeka gücünü parmaklarınızın ucuna getiren akıllı evcil hayvan sağlığı ve beslenme yönetimi uygulaması.
+
+🐾 AKILLI EVCİL HAYVAN YÖNETİMİ
+• Birden fazla evcil hayvanı (köpek ve kedi) tek bir yerde yönetin
+• Fotoğraflar, sağlık durumları ve diyet tercihleriyle detaylı profiller oluşturun
+• Kilo, aktivite seviyesi ve vücut tipini takip edin
+• Tıbbi geçmişi ve besin alerjilerini güvenle saklayın
+
+🍽️ YAPAY ZEKA DESTEKLİ BESLENME PLANLARI
+• Evcil hayvanınızın benzersiz ihtiyaçlarına göre kişiselleştirilmiş yemek önerileri alın
+• Hassas porsiyon boyutlarıyla beslenme programları alın
+• Her yemek planı için tam besin dökümünü görüntüleyin
+• Güvenlik notlarına ve önemli diyet uyarılarına erişin
+
+🏥 KAPSAMLI SAĞLIK TAKİBİ
+• Evcil hayvanınızın profiline göre yapay zeka sağlık raporları oluşturun
+• Kişiselleştirilmiş bakım önerileri alın
+• Sağlık geçmişini takip edin ve mevcut durumları izleyin
+• Kanıta dayalı sağlık önerileri alın
+
+🏥 VETERİNER KLİNİĞİ BULUN
+• Yakınınızdaki veteriner kliniklerini keşfedin
+• İsim, konum veya uzmanlık alanına göre arayın
+• Çalışma saatleri ve kimlik bilgileri dahil klinik detaylarını görüntüleyin
+• Kliniklere telefon, e-posta veya web sitesi üzerinden doğrudan ulaşın
+• EOI (Eyes on Initiative) ortak kliniklerini bulun
+
+👨‍⚕️ VETERİNER KLİNİKLERİ İÇİN
+• Kliniğinizi kaydedin ve çevrimiçi görünürlüğünüzü artırın
+• Veteriner hekim kimlik bilgilerini ve uzmanlık alanlarını sergileyin
+• Çalışma saatlerini ve klinik bilgilerini yönetin
+• Marka tanınırlığı için klinik logonuzu yükleyin
+• Bölgenizdeki evcil hayvan sahipleriyle bağlantı kurun
+
+🔐 GÜVENLİ VE GİZLİ
+• Biyometrik kimlik doğrulama (parmak izi/Face ID)
+• Tüm veriler şifrelenmiş ve güvenli şekilde iletilir
+• Gizlilik ayarlarınız üzerinde tam kontrol
+• GDPR uyumlu veri işleme
+
+🌍 ÇOK DİLLİ DESTEK
+İngilizce, Türkçe, Fince ve Hollandaca olarak mevcuttur
+
+EVCİL HAYVAN SAHİPLERİ NEDEN FAMMO'YU SEVİYOR:
+✓ Kişiselleştirilmiş evcil hayvan bakımı için yapay zeka gücü
+✓ Sağlık, beslenme ve veteriner bakımı için tek platform
+✓ Veterinerlik biliminden kanıta dayalı öneriler
+✓ Herkes için tasarlanmış sezgisel, güzel arayüz
+✓ Evcil hayvanınızın bilgileri her zaman parmaklarınızın ucunda
+
+FAMMO'yu bugün indirin ve evcil hayvanlarınıza hak ettikleri bakımı verin!
+
+Sorularınız veya geri bildirimleriniz mi var? support@fammo.ai adresinden bize ulaşın
+Web sitemizi ziyaret edin: https://fammo.ai

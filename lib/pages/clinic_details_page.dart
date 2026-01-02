@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../widgets/paw_loading_indicator.dart';
 import '../models/clinic.dart';
 import '../services/clinic_service.dart';
+import 'book_appointment_page.dart';
 
 class ClinicDetailsPage extends StatefulWidget {
   final int clinicId;
@@ -83,6 +84,16 @@ class _ClinicDetailsPageState extends State<ClinicDetailsPage> {
         );
       }
     }
+  }
+
+  void _navigateToBookAppointment() {
+    if (_clinic == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookAppointmentPage(clinic: _clinic!),
+      ),
+    );
   }
 
   Future<void> _openMap() async {
@@ -380,6 +391,33 @@ ${_clinic!.address.isNotEmpty ? _clinic!.address + '\n' : ''}${_clinic!.phone.is
                                           },
                                         ),
                                       ],
+                                    ),
+                                    
+                                    const SizedBox(height: 20),
+                                    
+                                    // Book Appointment Button
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton.icon(
+                                        onPressed: () => _navigateToBookAppointment(),
+                                        icon: const Icon(Icons.calendar_month, color: Colors.white),
+                                        label: const Text(
+                                          'Book Appointment',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF26B5A4),
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          elevation: 2,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

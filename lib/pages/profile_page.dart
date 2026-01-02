@@ -12,6 +12,8 @@ import 'pets_list_page.dart';
 import 'change_password_page.dart';
 import 'notification_settings_page.dart';
 import 'language_settings_page.dart';
+import 'my_appointments_page.dart';
+import 'clinic_appointments_page.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -230,6 +232,18 @@ class _ProfilePageState extends State<ProfilePage> {
                             },
                           ),
                           _buildMenuItemWithIcon(
+                            icon: Icons.calendar_month,
+                            title: 'My Appointments',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MyAppointmentsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          _buildMenuItemWithIcon(
                             icon: Icons.lock_outline,
                             title: loc.changePassword,
                             onTap: () {
@@ -271,6 +285,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                     if (result == true && mounted) {
                                       _loadUserProfile();
                                     }
+                                  },
+                                ),
+                                _buildMenuItemWithIcon(
+                                  icon: Icons.calendar_today,
+                                  title: 'Manage Appointments',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ClinicAppointmentsPage(),
+                                      ),
+                                    );
                                   },
                                 ),
                                 _buildMenuItemWithIcon(

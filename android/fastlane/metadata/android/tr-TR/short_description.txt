@@ -1,0 +1,1 @@
+Yapay zeka destekli evcil hayvan sağlığı ve beslenme yönetimi.

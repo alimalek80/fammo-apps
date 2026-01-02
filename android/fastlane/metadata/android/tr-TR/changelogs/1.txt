@@ -1,0 +1,16 @@
+🎉 FAMMO v1.0.0'a Hoş Geldiniz!
+
+Yapay zeka destekli evcil hayvan bakım asistanınız FAMMO'yu yayınlamaktan heyecan duyuyoruz!
+
+✨ Bu sürümdeki özellikler:
+• Evcil Hayvan Yönetimi - Detaylı profillerle birden fazla evcil hayvan ekleyin ve yönetin
+• Yapay Zeka Beslenme Planları - Evcil hayvanlarınız için kişiselleştirilmiş yemek önerileri alın
+• Yapay Zeka Sağlık Raporları - Kapsamlı sağlık değerlendirmeleri oluşturun
+• Klinik Keşfi - Yakınınızdaki veteriner kliniklerini bulun
+• Klinik Kaydı - Veterinerler kliniklerini kaydedebilir ve yönetebilir
+• Çok Dilli Destek - İngilizce, Türkçe, Fince ve Hollandaca
+• Biyometrik Giriş - Parmak izi veya Face ID ile güvenli erişim
+• Güzel Arayüz - Koyu/açık mod ile modern, sezgisel tasarım
+
+FAMMO'yu seçtiğiniz için teşekkürler! Geri bildirimlerinizi duymak isteriz.
+support@fammo.ai adresinden bize ulaşın
